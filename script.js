@@ -16,7 +16,7 @@ const asesoresDB = {
         { n: "FUENTES NUÑEZ BERENICE", t: "477" },
         { n: "RAMIREZ HERNANDEZ LEONARDO", t: "477" }
     ],
-    "889": [
+    "882": [
         { n: "LUNA ALVARADO MAURICIO", t: "477" },
         { n: "SANCHEZ MORELES ABELINA", t: "477" },
         { n: "RIOS SANDOVAL MAGNOLIA", t: "477" },
