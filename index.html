@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Gayosso</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-content">
+        <div class="logo-container">
+            <img id="logo-preview" src="logoalta.png" alt="Logo Gayosso">
+        </div>
+        <h1>Cotizador Institucional</h1>
+    </div>
+</header>
+
+<main class="container">
+    <section class="form-section">
+        
+        <!-- PASO 1: CLIENTE Y TIPO DE NECESIDAD -->
+        <div class="card">
+            <h2><span class="step">1</span> Datos del Cliente y Tipo de Necesidad</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Nombre a quien se cotiza</label>
+                    <input type="text" id="nombre-cliente" placeholder="Nombre completo del cliente">
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; background: #eef5f0; padding: 15px; border-radius: 8px; border-left: 5px solid #004b23;">
+                <div class="toggle-group">
+                    <label class="switch">
+                        <input type="checkbox" id="toggle-inmediato">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="font-weight: bold; color: #004b23; font-size: 1.1em; margin-left: 10px;">
+                        Cotizar como USO INMEDIATO (Anula descuentos y usa Precio Inmediato)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: ASESOR -->
+        <div class="card">
+            <h2><span class="step">2</span> Información del Asesor</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Gerencia</label>
+                    <select id="gerencia" onchange="actualizarAsesores()">
+                        <option value="">Seleccione...</option>
+                        <option value="340">340</option>
+                        <option value="342">342</option>
+                        <option value="882">882</option>
+                        <option value="703">703</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Asesor</label>
+                    <select id="asesor" onchange="actualizarTelefono()">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Teléfono de Contacto</label>
+                    <input type="text" id="telefono" readonly placeholder="Autocompletado">
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: SERVICIOS Y PROPIEDADES -->
+        <div class="card full-width">
+            <h2><span class="step">3</span> Selección de Servicios y Propiedades</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Servicios</label>
+                    <select id="servicio">
+                        <option value="0" data-precio-inm="0" data-nombre="Ninguno" data-clave="-">Seleccione un servicio...</option>
+                        <option value="43900" data-precio-inm="56300" data-nombre="Esencial" data-clave="S-101">Esencial</option>
+                        <option value="56600" data-precio-inm="78605" data-nombre="Universal" data-clave="S-102">Universal</option>
+                        <option value="74800" data-precio-inm="103855" data-nombre="Premier" data-clave="S-103">Premier</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Cantidad</label>
+                    <input type="number" id="cantidad-servicios" value="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Propiedades</label>
+                    <select id="propiedad">
+                        <option value="0" data-precio-inm="0" data-nombre="Ninguna" data-clave="-">Seleccione una propiedad...</option>
+                        <option value="776355" data-precio-inm="1155295" data-nombre="Capilla Estandar" data-clave="825746">PAQ. CAPILLA ESTANDAR SP 6G 6O</option>
+                        <option value="831160" data-precio-inm="1236845" data-nombre="Capilla clasica" data-clave="824975">PAQ. CAPILLA CLASICA SP 6G 6O</option>
+                        <option value="890530" data-precio-inm="1325195" data-nombre="Capilla Premier" data-clave="824977">PAQ. CAPILLA PREMIER SP 6G 6O</option>
+                        <option value="1000080" data-precio-inm="1488215" data-nombre="Capilla Estandar B" data-clave="825745">PAQ. CAPILLA ESTANDAR BP 6G 6O</option>
+                        <option value="1004815" data-precio-inm="1495255" data-nombre="Capilla clasica B" data-clave="824976">PAQ. CAPILLA CLASICA BP 6G 6O</option>
+                        <option value="1077320" data-precio-inm="1603160" data-nombre="Capilla Premier B" data-clave="824978">PAQ. CAPILLA PREMIER BP 6G 6O</option>
+                        <option value="41540" data-precio-inm="57065" data-nombre="PAQ Italiano" data-clave="824846">PAQ. ECOLOGICO CIPRES ITALIANO</option>
+                        <option value="57895" data-precio-inm="113520" data-nombre="PAQ GM Superior" data-clave="826257">PAQ. GAVETA MURAL NIVEL SUPERIOR</option>
+                        <option value="66650" data-precio-inm="130680" data-nombre="PAQ GM Inferior" data-clave="826259">PAQ. GAVETA MURAL NIVEL INFERIOR</option>
+                        <option value="76745" data-precio-inm="150480" data-nombre="PAQ GM Medio" data-clave="826258">PAQ. GAVETA MURAL NIVEL MEDIO</option>
+                        <option value="133295" data-precio-inm="261360" data-nombre="PAQ GM Doble Inferior" data-clave="826964">PAQ. GAVETA MURAL DOBLE NIVEL INFERIOR</option>
+                        <option value="402510" data-precio-inm="552900" data-nombre="PAQ JardinP" data-clave="825844">PAQ. JARDIN PRIVADO 4G 4OS</option>
+                        <option value="64440" data-precio-inm="92800" data-nombre="PAQ 4G" data-clave="824833">PAQ. 4 GAVETAS T.A.</option>
+                        <option value="36570" data-precio-inm="54420" data-nombre="PAQ Nicho Chico SUP/INF" data-clave="825741">PAQ. NICHO CHICO SUP/INF</option>
+                        <option value="49370" data-precio-inm="73465" data-nombre="PAQ Nicho Medio" data-clave="825740">PAQ. NICHO CHICO MEDIO</option>
+                        <option value="58770" data-precio-inm="87455" data-nombre="PAQ Nicho Chico ZC Medio" data-clave="822213">PAQ. NICHO CHICO ZONA CAPILLA NIVEL MEDIO</option>
+                        <option value="95350" data-precio-inm="186960" data-nombre="SM Inferior" data-clave="826666">SENDERO MEMORIAL PREMIER NIVEL INFERIOR</option>
+                        <option value="119185" data-precio-inm="233700" data-nombre="SM Medio" data-clave="826665">SENDERO MEMORIAL PREMIER NIVEL MEDIO</option>
+                        <option value="143025" data-precio-inm="280440" data-nombre="SM Superior" data-clave="826664">SENDERO MEMORIAL PREMIER NIVEL SUPERIOR</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 4: PAGOS -->
+        <div class="card">
+            <h2><span class="step">4</span> Configuración de Venta y Pagos</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Esquema de Pago</label>
+                    <select id="tipo-pago">
+                        <option value="normal">Tradicional (Aplica MP)</option>
+                        <option value="contado">Contado (20% Desc. Único)</option>
+                        <option value="enganche">Enganche (15% MP Fijo)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Método de Pago (Descuento)</label>
+                    <select id="metodo-pago">
+                        <option value="0">M036 (0%)</option>
+                        <option value="3">DD36 (3%)</option>
+                        <option value="8">D036 (8%)</option>
+                        <option value="15">D035 (15%)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <button class="btn-generate" onclick="generarCotizacion()">Calcular y Mostrar Cotización</button>
+
+    <!-- ÁREA DE RESULTADOS (PDF) -->
+    <section id="resultado-cotizacion" class="result-area" style="display: none;">
+        <div id="pdf-capture" class="quote-page">
+            <div class="quote-header">
+                <img id="logo-quote" src="logo.png" style="height: 60px;">
+                <div class="quote-title">
+                    <h3 id="titulo-cotizacion">COTIZACIÓN FORMAL</h3>
+                    <p id="fecha-label"></p>
+                </div>
+            </div>
+
+            <div class="quote-info">
+                <p><strong>Cliente:</strong> <span id="res-cliente" style="text-transform: uppercase; font-size: 1.1em; color: #004b23;"></span></p>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+                <p><strong>Gerencia:</strong> <span id="res-gerencia"></span></p>
+                <p><strong>Asesor:</strong> <span id="res-asesor"></span></p>
+                <p><strong>Teléfono:</strong> <span id="res-telefono"></span></p>
+            </div>
+
+            <table class="quote-table">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th>Clave</th>
+                        <th>P. Base <span id="lbl-tipo-precio"></span></th>
+                        <th>Desc. Promo</th>
+                        <th>P. Promo</th>
+                        <th>Desc. MP</th>
+                        <th>P. Final</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-items"></tbody>
+                <tfoot id="totales-tabla"></tfoot>
+            </table>
+        </div>
+
+        <div class="download-actions">
+            <button class="btn-pdf" onclick="descargarPDF()">Descargar PDF</button>
+            <button class="btn-img" onclick="descargarImagen()">Descargar como Imagen</button>
+        </div>
+    </section>
+
+    <!-- CATÁLOGO VISUAL SEPARADO AL FINAL -->
+    <section class="card full-width" style="margin-top: 40px;">
+        <h2>Catálogo de Ataúdes y Urnas</h2>
+        <p style="color: #666; margin-bottom: 15px;">Haz clic en una imagen para ampliarla.</p>
+        <div class="catalog-grid">
+            <div class="catalog-item">
+                <label>Ataúdes Inhumación</label>
+                <div class="box-preview">
+                    <img src="inhumacion.png" alt="Ataúdes Inhumación" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+            <div class="catalog-item">
+                <label>Ataúdes Cremación</label>
+                <div class="box-preview">
+                    <img src="cremacion.png" alt="Ataúdes Cremación" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+            <div class="catalog-item">
+                <label>Urnas</label>
+                <div class="box-preview">
+                    <img src="urnas.png" alt="Urnas" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- MODAL PARA IMÁGENES -->
+<div id="imgModal" class="modal">
+    <span class="close" onclick="cerrarModal()">&times;</span>
+    <img class="modal-content" id="imgAmpliacion">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
