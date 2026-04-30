@@ -17,7 +17,7 @@ const asesoresDB = {
         { n: "RAMIREZ HERNANDEZ LEONARDO", t: "477" }
     ],
     "882": [
-        { n: "LUNA ALVARADO MAURICIO", t: "477" },
+        { n: "LUNA ALVARADO MAURICIO", t: "477 " },
         { n: "SANCHEZ MORELES ABELINA", t: "477" },
         { n: "RIOS SANDOVAL MAGNOLIA", t: "477" },
         { n: "ACOSTA MOLINA ELENA MARIA GUADALUPE", t: "477" },
