@@ -55,7 +55,7 @@
                         <option value="">Seleccione...</option>
                         <option value="340">340</option>
                         <option value="342">342</option>
-                        <option value="882">882</option>
+                        <option value="889">889</option>
                         <option value="703">703</option>
                     </select>
                 </div>
@@ -149,7 +149,7 @@
     <section id="resultado-cotizacion" class="result-area" style="display: none;">
         <div id="pdf-capture" class="quote-page">
             <div class="quote-header">
-                <img id="logo-quote" src="logo.png" style="height: 60px;">
+                <img id="logo-quote" src="logoalta.png" style="height: 60px;">
                 <div class="quote-title">
                     <h3 id="titulo-cotizacion">COTIZACIÓN FORMAL</h3>
                     <p id="fecha-label"></p>
@@ -164,21 +164,24 @@
                 <p><strong>Teléfono:</strong> <span id="res-telefono"></span></p>
             </div>
 
-            <table class="quote-table">
-                <thead>
-                    <tr>
-                        <th>Concepto</th>
-                        <th>Clave</th>
-                        <th>P. Base <span id="lbl-tipo-precio"></span></th>
-                        <th>Desc. Promo</th>
-                        <th>P. Promo</th>
-                        <th>Desc. MP</th>
-                        <th>P. Final</th>
-                    </tr>
-                </thead>
-                <tbody id="lista-items"></tbody>
-                <tfoot id="totales-tabla"></tfoot>
-            </table>
+            <!-- CONTENEDOR RESPONSIVO PARA LA TABLA -->
+            <div class="table-responsive">
+                <table class="quote-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Clave</th>
+                            <th>P. Base <span id="lbl-tipo-precio"></span></th>
+                            <th>Desc. Promo</th>
+                            <th>P. Promo</th>
+                            <th>Desc. MP</th>
+                            <th>P. Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-items"></tbody>
+                    <tfoot id="totales-tabla"></tfoot>
+                </table>
+            </div>
         </div>
 
         <div class="download-actions">

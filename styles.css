@@ -104,12 +104,22 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .box-preview img:hover { opacity: 0.7; transform: scale(1.05); }
 
+/* TABLA Y RECIBO */
 .quote-page { background: white; padding: 40px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 .quote-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--primary); padding-bottom: 20px; }
 .quote-title h3 { margin: 0; color: var(--primary); }
 .quote-info { margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 6px; }
 .quote-info p { margin: 5px 0; }
-.quote-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+
+/* NUEVO: Contenedor responsivo para la tabla */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 20px;
+}
+
+.quote-table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Mínimo para que no se apelmace */
 .quote-table th { background: var(--primary); color: white; padding: 12px; text-align: left; }
 .quote-table td { padding: 12px; border-bottom: 1px solid #eee; }
 .text-right { text-align: right; }
@@ -156,7 +166,17 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .close:hover, .close:focus { color: #d4af37; text-decoration: none; }
 
+/* MEDIA QUERIES PARA CELULARES */
 @media (max-width: 768px) {
     .catalog-grid, .grid-selection, .download-actions { grid-template-columns: 1fr; flex-direction: column; }
     .close { right: 20px; font-size: 35px; }
+    
+    .quote-page {
+        padding: 20px; /* Menos espacio a los lados en celular */
+    }
+    
+    .quote-table th, .quote-table td {
+        padding: 8px; /* Reducir padding interno para que quepa mejor */
+        font-size: 13px;
+    }
 }

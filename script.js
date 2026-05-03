@@ -16,7 +16,7 @@ const asesoresDB = {
         { n: "FUENTES NUÑEZ BERENICE", t: "477" },
         { n: "RAMIREZ HERNANDEZ LEONARDO", t: "477" }
     ],
-    "882": [
+    "889": [ // Cambiado de 882 a 889
         { n: "LUNA ALVARADO MAURICIO", t: "477 " },
         { n: "SANCHEZ MORELES ABELINA", t: "477" },
         { n: "RIOS SANDOVAL MAGNOLIA", t: "477" },
@@ -170,8 +170,15 @@ function generarCotizacion() {
     let htmlTotales = `<tr><td colspan="6" align="right">SUBTOTAL:</td><td class="text-right">${fmt(sumaFinal)}</td></tr>`;
     htmlTotales += `<tr class="total-highlight"><td colspan="6" align="right">TOTAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(sumaFinal)}</td></tr>`;
     
+    // Enganche referencial
     if (tp === 'enganche' && !esInmediato) {
         htmlTotales += `<tr style="color:#c0392b; font-weight:bold;"><td colspan="6" align="right">Monto Sugerido de Enganche (15%):</td><td class="text-right">${fmt(sumaFinal * 0.15)}</td></tr>`;
+    }
+
+    // NUEVO: Mensualidad dividida en 36 meses (Si no es de contado y la suma final es mayor a 0)
+    if (tp !== 'contado' && sumaFinal > 0) {
+        let mensualidad = sumaFinal / 36;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">Inversión a 36 Mensualidades:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
     }
 
     totales.innerHTML = htmlTotales;
