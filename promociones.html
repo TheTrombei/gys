@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promociones Especiales - Gayosso</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="header-content">
+        <div class="logo-container">
+            <img id="logo-preview" src="logoalta.png" alt="Logo Gayosso">
+        </div>
+        <div class="header-titles">
+            <h1>Cotizador Institucional</h1>
+            <nav class="nav-buttons">
+                <a href="index.html" class="nav-btn">Inicio</a>
+                <a href="promociones.html" class="nav-btn active">Promociones Especiales</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <section class="form-section">
+        
+        <div class="card">
+            <h2><span class="step">1</span> Datos del Cliente</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Nombre a quien se cotiza</label>
+                    <input type="text" id="nombre-cliente" placeholder="Nombre completo del cliente">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="step">2</span> Información del Asesor</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Gerencia</label>
+                    <select id="gerencia" onchange="actualizarAsesores()">
+                        <option value="">Seleccione...</option>
+                        <option value="340">340</option>
+                        <option value="342">342</option>
+                        <option value="889">889</option>
+                        <option value="703">703</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Asesor</label>
+                    <select id="asesor" onchange="actualizarTelefono()">
+                        <option value="">Seleccione...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Teléfono de Contacto</label>
+                    <input type="text" id="telefono" readonly placeholder="Autocompletado">
+                </div>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2><span class="step">3</span> Configuración de la Promoción</h2>
+            <div class="grid-selection">
+                <div class="input-group">
+                    <label>Servicio Funerario (Precio Lista Normal)</label>
+                    <select id="servicio-especial">
+                        <option value="56600">Universal - $56,600</option>
+                        <option value="74800">Premier - $74,800</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Tipo de Promoción</label>
+                    <select id="tipo-promo" onchange="toggleOpcionesPromo()">
+                        <option value="3x2">3 x 2 (Paga 2, Lleva 3)</option>
+                        <option value="4x2">4 x 2 (Paga 2, Lleva 4)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" id="grupo-mp-especial">
+                    <label>Método de Pago</label>
+                    <select id="metodo-pago-especial">
+                        <option value="0">M036 (0% Descuento)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="grupo-tipo-pago-4x2" style="display:none;">
+                    <label>Forma de Pago (4x2)</label>
+                    <select id="tipo-pago-4x2" onchange="toggleFinanciamiento4x2()">
+                        <option value="financiado">Financiado (Aplica Enganche)</option>
+                        <option value="contado">Contado (5% Descuento)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="panel-financiamiento-4x2" style="display:none; margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee;">
+                <h3 style="color: var(--primary); margin-top: 0; font-size: 1rem;">Opciones de Financiamiento 4x2</h3>
+                <div class="grid-selection">
+                    <div class="input-group">
+                        <label>Plazo Mensual</label>
+                        <select id="plazo-4x2">
+                            <option value="12">12 Meses</option>
+                            <option value="24">24 Meses</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Porcentaje de Enganche (1ra Mensualidad)</label>
+                        <select id="enganche-4x2">
+                            <option value="15">15%</option>
+                            <option value="30">30%</option>
+                        </select>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 0;">*Nota: El enganche se considera la primera mensualidad. El saldo restante se divide entre los meses que queden (11 o 23).</p>
+            </div>
+        </div>
+
+    </section>
+
+    <button class="btn-generate" onclick="generarCotizacionEspecial()">Generar Cotización Especial</button>
+
+    <section id="resultado-cotizacion" class="result-area" style="display: none;">
+        <div id="pdf-capture" class="quote-page">
+            <div class="quote-header">
+                <img id="logo-quote" src="logoalta.png" style="height: 60px;">
+                <div class="quote-title">
+                    <h3 id="titulo-cotizacion">PROMOCIÓN ESPECIAL GAYOSSO</h3>
+                    <p id="fecha-label"></p>
+                </div>
+            </div>
+
+            <div class="quote-info">
+                <p><strong>Cliente:</strong> <span id="res-cliente" style="text-transform: uppercase;"></span></p>
+                <p><strong>Asesor:</strong> <span id="res-asesor"></span> | <strong>Tel:</strong> <span id="res-telefono"></span></p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="quote-table">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th class="text-right">Precio Lista Normal</th>
+                            <th class="text-right">Desc. Promo Especial</th>
+                            <th class="text-right">Total Final (x2 serv.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-items"></tbody>
+                    <tfoot id="totales-tabla"></tfoot>
+                </table>
+            </div>
+        </div>
+
+        <div class="download-actions">
+            <button class="btn-pdf" onclick="descargarPDF()">Descargar PDF</button>
+            <button class="btn-img" onclick="descargarImagen()">Descargar como Imagen</button>
+        </div>
+    </section>
+
+    <section class="card full-width" style="margin-top: 40px;">
+        <h2>Catálogo de Ataúdes y Urnas</h2>
+        <p style="color: #666; margin-bottom: 15px;">Haz clic en una imagen para ampliarla.</p>
+        <div class="catalog-grid">
+            <div class="catalog-item">
+                <label>Ataúdes Inhumación</label>
+                <div class="box-preview">
+                    <img src="inhumacion.png" alt="Ataúdes Inhumación" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+            <div class="catalog-item">
+                <label>Ataúdes Cremación</label>
+                <div class="box-preview">
+                    <img src="cremacion.png" alt="Ataúdes Cremación" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+            <div class="catalog-item">
+                <label>Urnas</label>
+                <div class="box-preview">
+                    <img src="urnas.png" alt="Urnas" onclick="abrirModal(this.src)">
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="imgModal" class="modal">
+    <span class="close" onclick="cerrarModal()">&times;</span>
+    <img class="modal-content" id="imgAmpliacion">
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
