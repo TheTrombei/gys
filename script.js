@@ -46,11 +46,11 @@ const asesoresDB = {
 const tablaIntegrales = {
     "capilla": [3, 5, 6, 7],
     "jardin":  [7, 9, 11, 12],
-    "lote":    [10, 15, 15, 20],
-    "nicho":   [15, 20, 20, 25],
-    "cipres":  [15, 20, 20, 30],
-    "mural":   [20, 25, 25, 30],
-    "sendero": [20, 25, 25, 30]
+    "lote":    [10, 20, 20, 25],
+    "nicho":   [15, 25, 25, 30],
+    "cipres":  [15, 25, 25, 30],
+    "mural":   [20, 30, 30, 35],
+    "sendero": [20, 30, 30, 35]
 };
 
 function actualizarAsesores() {
@@ -92,10 +92,29 @@ function toggleOpcionesPromo() {
     if (promo === '3x2') {
         document.getElementById('panel-3x2').style.display = 'block';
         document.getElementById('panel-4x2').style.display = 'none';
+        toggleEnganche3x2();
     } else {
         document.getElementById('panel-3x2').style.display = 'none';
         document.getElementById('panel-4x2').style.display = 'block';
         toggleEnganche4x2();
+    }
+}
+
+function toggleEnganche3x2() {
+    const mpVal = document.getElementById('mp-3x2');
+    if(!mpVal) return;
+    const grupoEng = document.getElementById('grupo-enganche-3x2');
+    const grupoPlazo = document.getElementById('grupo-plazo-3x2');
+    const nota = document.getElementById('nota-3x2');
+    
+    if (mpVal.value === 'contado') {
+        grupoEng.style.display = 'none';
+        if(grupoPlazo) grupoPlazo.style.display = 'none';
+        nota.style.display = 'none';
+    } else {
+        grupoEng.style.display = 'block';
+        if(grupoPlazo) grupoPlazo.style.display = 'block';
+        nota.style.display = 'block';
     }
 }
 
@@ -145,9 +164,16 @@ function generarCotizacionEspecial() {
             let nombreMP = mpDesc === 3 ? "DD36" : (mpDesc === 8 ? "D036" : "D035");
             descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
             
+            const meses = parseInt(document.getElementById('plazo-3x2').value);
+            const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
+            let engancheMonto = totalPagar * enganchePorcentaje;
+            let saldoRestante = totalPagar - engancheMonto;
+            let mensualidadFinanciada = saldoRestante / (meses - 1);
+            
             lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
             htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
+            htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
         }
     } else {
         const formaPago = document.getElementById('forma-pago-4x2').value;
@@ -210,19 +236,26 @@ function generarCotizacion() {
     if (esInmediato) {
         dPromoServicio = 0; dPromoPropiedad = 0; dMP = 0;
     } else {
-        dMP = (tp === 'enganche') ? 15 : mp;
-        if (tp === 'contado') {
-            dPromoServicio = 20; dPromoPropiedad = 20;
+        // REGLA ESTRICTA: Si es M036 (0%), BLOQUEA todos los descuentos da igual lo que compren
+        if (mp === 0) {
+            dPromoServicio = 0;
+            dPromoPropiedad = 0;
+            dMP = 0;
         } else {
-            if (cantServicios > 0 && valPropiedad > 0) {
-                const cat = selProp.options[selProp.selectedIndex].dataset.categoria;
-                if (cat && tablaIntegrales[cat]) {
-                    let idx = cantServicios >= 4 ? 3 : cantServicios - 1;
-                    dPromoServicio = tablaIntegrales[cat][idx];
-                    dPromoPropiedad = tablaIntegrales[cat][idx];
+            dMP = (tp === 'enganche') ? 15 : mp;
+            if (tp === 'contado') {
+                dPromoServicio = 20; dPromoPropiedad = 20;
+            } else {
+                if (cantServicios > 0 && valPropiedad > 0) {
+                    const cat = selProp.options[selProp.selectedIndex].dataset.categoria;
+                    if (cat && tablaIntegrales[cat]) {
+                        let idx = cantServicios >= 4 ? 3 : cantServicios - 1;
+                        dPromoServicio = tablaIntegrales[cat][idx];
+                        dPromoPropiedad = tablaIntegrales[cat][idx];
+                    }
+                } else if (cantServicios > 0) {
+                    dPromoServicio = (cantServicios === 1) ? 10 : 20;
                 }
-            } else if (cantServicios > 0) {
-                dPromoServicio = (cantServicios === 1) ? 10 : 20;
             }
         }
     }
@@ -251,9 +284,9 @@ function generarCotizacion() {
         let saldoRestante = sumaFinal - engancheMonto;
         let mensualidad = saldoRestante / 36; 
 
-        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche (${enganchePorc*100}%):</td><td class="text-right">${fmt(engancheMonto)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche Inicial (${enganchePorc*100}%):</td><td class="text-right">${fmt(engancheMonto)}</td></tr>`;
         totales.innerHTML += `<tr><td colspan="6" align="right">Saldo a Financiar:</td><td class="text-right">${fmt(saldoRestante)}</td></tr>`;
-        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
     } else if (tp === 'normal' && sumaFinal > 0) {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(sumaFinal/36)}</td></tr>`;
     }
