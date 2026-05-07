@@ -76,24 +76,41 @@ function actualizarTelefono() {
 
 function fmt(n) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n); }
 
-// --- LOGICA PAGINA PROMOCIONES ---
-function toggleOpcionesPromo() {
-    const promo = document.getElementById('tipo-promo').value;
-    document.getElementById('grupo-mp-especial').style.display = (promo === '3x2') ? 'block' : 'none';
-    
-    // Al cambiar de promo, reiniciar paneles de 4x2
-    if(promo !== '4x2') {
-        document.getElementById('grupo-tipo-pago-4x2').style.display = 'none';
-        document.getElementById('panel-financiamiento-4x2').style.display = 'none';
-    } else {
-        document.getElementById('grupo-tipo-pago-4x2').style.display = 'block';
-        toggleFinanciamiento4x2(); // Checar estado inicial del selector financiado/contado
+// --- LOGICA INTERFAZ INICIO ---
+function toggleOpcionesEnganche() {
+    const tp = document.getElementById('tipo-pago');
+    if(tp) {
+        const panel = document.getElementById('grupo-enganche-principal');
+        if(panel) panel.style.display = (tp.value === 'enganche') ? 'block' : 'none';
     }
 }
 
-function toggleFinanciamiento4x2() {
-    const tipoPago = document.getElementById('tipo-pago-4x2').value;
-    document.getElementById('panel-financiamiento-4x2').style.display = (tipoPago === 'financiado') ? 'block' : 'none';
+// --- LOGICA PAGINA PROMOCIONES ---
+function toggleOpcionesPromo() {
+    const promo = document.getElementById('tipo-promo').value;
+    
+    if (promo === '3x2') {
+        document.getElementById('panel-3x2').style.display = 'block';
+        document.getElementById('panel-4x2').style.display = 'none';
+    } else {
+        document.getElementById('panel-3x2').style.display = 'none';
+        document.getElementById('panel-4x2').style.display = 'block';
+        toggleEnganche4x2();
+    }
+}
+
+function toggleEnganche4x2() {
+    const formaPago = document.getElementById('forma-pago-4x2').value;
+    const grupoEnganche = document.getElementById('grupo-enganche-4x2');
+    const nota = document.getElementById('nota-4x2');
+    
+    if (formaPago === 'contado') {
+        grupoEnganche.style.display = 'none';
+        nota.style.display = 'none';
+    } else {
+        grupoEnganche.style.display = 'block';
+        nota.style.display = 'block';
+    }
 }
 
 function generarCotizacionEspecial() {
@@ -107,103 +124,75 @@ function generarCotizacionEspecial() {
     totales.innerHTML = '';
     let totalPagar = 0;
     let subtitulo = "";
-
-    // Siempre se pagan 2 servicios de base (precio lista normal)
     let precioBase = servicioPrecio * 2;
     let descTexto = "";
+    let htmlTotales = "";
 
     if (promo === '3x2') {
-        const mpDesc = parseFloat(document.getElementById('metodo-pago-especial').value) || 0;
-        // M036 es 0%, pero la formula queda lista si cambia la regla
-        totalPagar = precioBase * (1 - (mpDesc / 100));
-        descTexto = `Paga 2, Lleva 3 (M036)`;
+        const mpVal = document.getElementById('mp-3x2').value;
         subtitulo = "Promoción 3 x 2";
-    } else {
-        const tipoPago4x2 = document.getElementById('tipo-pago-4x2').value;
-        subtitulo = "Promoción 4 x 2";
-        
-        if (tipoPago4x2 === 'contado') {
-            totalPagar = precioBase * 0.95; // 5% Descuento directo
-            descTexto = "Paga 2, Lleva 4 (Contado -5%)";
+
+        if (mpVal === 'contado') {
+            totalPagar = precioBase * 0.95; // 5% para contado promo
+            descTexto = `Paga 2, Lleva 3 (Contado -5%)`;
+            
+            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
         } else {
-            totalPagar = precioBase; // Precio base normal financiado
-            descTexto = "Paga 2, Lleva 4 (Financiado)";
+            let mpDesc = parseFloat(mpVal);
+            totalPagar = precioBase * (1 - (mpDesc / 100));
+            let nombreMP = mpDesc === 3 ? "DD36" : (mpDesc === 8 ? "D036" : "D035");
+            descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
+            
+            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
         }
-    }
-
-    // Fila del artículo en la tabla
-    lista.innerHTML = `
-        <tr>
-            <td>Paquete ${subtitulo} (Universal/Premier)</td>
-            <td class="text-right">${fmt(precioBase)}</td>
-            <td class="text-right">${descTexto}</td>
-            <td class="text-right"><strong>${fmt(totalPagar)}</strong></td>
-        </tr>
-    `;
-
-    // --- RENDERIZADO DE TOTALES Y MENSUALIDADES ---
-    
-    // Fila 1: Total Final
-    let htmlTotales = `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-
-    // Lógica de cuotas según la promoción
-    if (promo === '3x2') {
-        // Tradicional 36 meses directo sobre el total
-        htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
     } else {
-        // Lógica 4x2
-        const tipoPago4x2 = document.getElementById('tipo-pago-4x2').value;
-        
-        if (tipoPago4x2 === 'financiado') {
-            const meses = parseInt(document.getElementById('plazo-4x2').value);
+        const formaPago = document.getElementById('forma-pago-4x2').value;
+        subtitulo = "Promoción 4 x 2";
+
+        if (formaPago === 'contado') {
+            totalPagar = precioBase * 0.95; 
+            descTexto = "Paga 2, Lleva 4 (Contado -5%)";
+            
+            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
+        } else {
+            totalPagar = precioBase; 
+            descTexto = `Paga 2, Lleva 4 (${formaPago})`;
+            const meses = (formaPago === 'D012') ? 12 : 24;
             const enganchePorcentaje = parseInt(document.getElementById('enganche-4x2').value) / 100;
             
-            // CÁLCULO NUEVO SOLICITADO
-            // 1. El enganche es el monto directo (la primer mensualidad)
             let engancheMonto = totalPagar * enganchePorcentaje;
-            
-            // 2. El saldo restante
             let saldoRestante = totalPagar - engancheMonto;
-            
-            // 3. Meses restantes
-            let mesesRestantes = meses - 1;
-            
-            // 4. Mensualidad financiada
-            let mensualidadFinanciada = saldoRestante / mesesRestantes;
+            let mensualidadFinanciada = saldoRestante / (meses - 1);
 
-            // Renderizado en tabla
+            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
             htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
-            htmlTotales += `<tr><td colspan="3" align="right">Saldo Restante Financiado:</td><td class="text-right">${fmt(saldoRestante)}</td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${mesesRestantes} Mensualidades Restantes de:</td><td class="text-right" style="font-size:1.1em;">${fmt(mensualidadFinanciada)}</td></tr>`;
-        
-        } else {
-            // Contado 4x2, solo muestra que es pago único
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
         }
     }
 
     totales.innerHTML = htmlTotales;
-    
-    // Llenar info de cabecera del recibo
     document.getElementById('res-cliente').innerText = cliente;
     document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
     document.getElementById('res-telefono').innerText = document.getElementById('telefono').value;
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
-    
-    // Mostrar y scrollear
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- LOGICA PAGINA INICIO (Mantenida exactamente igual) ---
+// --- LOGICA PAGINA INICIO ---
 function generarCotizacion() {
     if(!document.getElementById('tipo-pago')) return; 
 
     const tp = document.getElementById('tipo-pago').value;
     const mp = parseFloat(document.getElementById('metodo-pago').value);
-    const toggleElement = document.getElementById('toggle-inmediato');
-    const esInmediato = toggleElement ? toggleElement.checked : false;
-    
+    const esInmediato = document.getElementById('toggle-inmediato').checked;
     const lista = document.getElementById('lista-items');
     const totales = document.getElementById('totales-tabla');
     lista.innerHTML = '';
@@ -253,8 +242,21 @@ function generarCotizacion() {
     }
 
     totales.innerHTML = `<tr class="total-highlight"><td colspan="6" align="right">TOTAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(sumaFinal)}</td></tr>`;
-    if (tp === 'enganche' && !esInmediato) totales.innerHTML += `<tr style="color:#c0392b; font-weight:bold;"><td colspan="6" align="right">Monto Sugerido de Enganche (15%):</td><td class="text-right">${fmt(sumaFinal*0.15)}</td></tr>`;
-    if (tp !== 'contado' && sumaFinal > 0) totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(sumaFinal/36)}</td></tr>`;
+    
+    if (tp === 'contado') {
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">PAGO ÚNICO DE CONTADO:</td><td class="text-right">${fmt(sumaFinal)}</td></tr>`;
+    } else if (tp === 'enganche' && !esInmediato) {
+        const enganchePorc = parseInt(document.getElementById('enganche-principal').value) / 100;
+        let engancheMonto = sumaFinal * enganchePorc;
+        let saldoRestante = sumaFinal - engancheMonto;
+        let mensualidad = saldoRestante / 36; 
+
+        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche (${enganchePorc*100}%):</td><td class="text-right">${fmt(engancheMonto)}</td></tr>`;
+        totales.innerHTML += `<tr><td colspan="6" align="right">Saldo a Financiar:</td><td class="text-right">${fmt(saldoRestante)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
+    } else if (tp === 'normal' && sumaFinal > 0) {
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(sumaFinal/36)}</td></tr>`;
+    }
 
     document.getElementById('res-cliente').innerText = document.getElementById('nombre-cliente').value;
     document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
@@ -264,28 +266,7 @@ function generarCotizacion() {
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- FUNCIONES COMUNES (Descargas y Modal) ---
-function descargarPDF() {
-    const { jsPDF } = window.jspdf;
-    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
-        const img = canvas.toDataURL('image/jpeg', 1.0);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(img, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('Cotizacion_Gayosso.pdf');
-    });
-}
-
-function descargarImagen() {
-    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'Cotizacion_Gayosso.jpg';
-        link.href = canvas.toDataURL('image/jpeg', 1.0);
-        link.click();
-    });
-}
-
+// --- COMUNES ---
 function abrirModal(src) { 
     const modal = document.getElementById("imgModal");
     const modalImg = document.getElementById("imgAmpliacion");
@@ -300,9 +281,21 @@ function cerrarModal() {
         modal.style.display = "none";
     }
 }
-window.onclick = function(event) {
-    const modal = document.getElementById("imgModal");
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
+window.onclick = function(e) { if(e.target == document.getElementById("imgModal")) cerrarModal(); }
+
+function descargarPDF() {
+    const { jsPDF } = window.jspdf;
+    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 0, 0, 210, (canvas.height * 210) / canvas.width);
+        pdf.save('Cotizacion_Gayosso.pdf');
+    });
+}
+function descargarImagen() {
+    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Cotizacion_Gayosso.jpg';
+        link.href = canvas.toDataURL('image/jpeg');
+        link.click();
+    });
 }

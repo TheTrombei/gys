@@ -81,34 +81,32 @@
                         <option value="4x2">4 x 2 (Paga 2, Lleva 4)</option>
                     </select>
                 </div>
-                
-                <div class="input-group" id="grupo-mp-especial">
-                    <label>Método de Pago</label>
-                    <select id="metodo-pago-especial">
-                        <option value="0">M036 (0% Descuento)</option>
-                    </select>
-                </div>
+            </div>
 
-                <div class="input-group" id="grupo-tipo-pago-4x2" style="display:none;">
-                    <label>Forma de Pago (4x2)</label>
-                    <select id="tipo-pago-4x2" onchange="toggleFinanciamiento4x2()">
-                        <option value="financiado">Financiado (Aplica Enganche)</option>
+            <div id="panel-3x2" style="display:block; margin-top: 15px;">
+                <div class="input-group" style="max-width: 300px;">
+                    <label>Forma de Pago (3x2)</label>
+                    <select id="mp-3x2">
+                        <option value="3">DD36 (3% Descuento)</option>
+                        <option value="8">D036 (8% Descuento)</option>
+                        <option value="15">D035 (15% Descuento)</option>
                         <option value="contado">Contado (5% Descuento)</option>
                     </select>
                 </div>
             </div>
 
-            <div id="panel-financiamiento-4x2" style="display:none; margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee;">
-                <h3 style="color: var(--primary); margin-top: 0; font-size: 1rem;">Opciones de Financiamiento 4x2</h3>
+            <div id="panel-4x2" style="display:none; margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee;">
+                <h3 style="color: var(--primary); margin-top: 0; font-size: 1rem;">Opciones de Pago 4x2</h3>
                 <div class="grid-selection">
                     <div class="input-group">
-                        <label>Plazo Mensual</label>
-                        <select id="plazo-4x2">
-                            <option value="12">12 Meses</option>
-                            <option value="24">24 Meses</option>
+                        <label>Forma de Pago (Sin descuento por MP)</label>
+                        <select id="forma-pago-4x2" onchange="toggleEnganche4x2()">
+                            <option value="D012">D012 (12 Meses)</option>
+                            <option value="D024">D024 (24 Meses)</option>
+                            <option value="contado">Contado (5% Descuento)</option>
                         </select>
                     </div>
-                    <div class="input-group">
+                    <div class="input-group" id="grupo-enganche-4x2">
                         <label>Porcentaje de Enganche (1ra Mensualidad)</label>
                         <select id="enganche-4x2">
                             <option value="15">15%</option>
@@ -116,7 +114,7 @@
                         </select>
                     </div>
                 </div>
-                <p style="font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 0;">*Nota: El enganche se considera la primera mensualidad. El saldo restante se divide entre los meses que queden (11 o 23).</p>
+                <p style="font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 0;" id="nota-4x2">*Nota: El enganche se considera la primera mensualidad.</p>
             </div>
         </div>
 

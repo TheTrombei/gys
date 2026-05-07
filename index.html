@@ -125,10 +125,10 @@
             <div class="grid-selection">
                 <div class="input-group">
                     <label>Esquema de Pago</label>
-                    <select id="tipo-pago">
+                    <select id="tipo-pago" onchange="toggleOpcionesEnganche()">
                         <option value="normal">Tradicional (Aplica MP)</option>
                         <option value="contado">Contado (20% Desc. Único)</option>
-                        <option value="enganche">Enganche (15% MP Fijo)</option>
+                        <option value="enganche">Enganche</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -138,6 +138,13 @@
                         <option value="3">DD36 (3%)</option>
                         <option value="8">D036 (8%)</option>
                         <option value="15">D035 (15%)</option>
+                    </select>
+                </div>
+                <div class="input-group" id="grupo-enganche-principal" style="display:none;">
+                    <label>Porcentaje de Enganche</label>
+                    <select id="enganche-principal">
+                        <option value="15">15%</option>
+                        <option value="30">30%</option>
                     </select>
                 </div>
             </div>
