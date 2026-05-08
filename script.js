@@ -84,10 +84,10 @@ function toggleOpcionesEnganche() {
     
     if(tp && mp) {
         if(tp.value === 'enganche') {
-            mp.disabled = true; // Bloquea la selección manual
+            mp.disabled = true; 
             if(panel) panel.style.display = 'block';
         } else {
-            mp.disabled = false; // Desbloquea si cambian a otra opción
+            mp.disabled = false; 
             if(panel) panel.style.display = 'none';
         }
     }
@@ -101,13 +101,11 @@ function toggleEnganche3x2() {
     const grupoPlazo = document.getElementById('grupo-plazo-3x2');
     const nota = document.getElementById('nota-3x2');
     
-    // Si seleccionan las opciones a 36 meses directo o contado, se esconden los selectores
     if (mpVal.value === 'contado' || mpVal.value === '3' || mpVal.value === '8') {
         if(grupoEng) grupoEng.style.display = 'none';
         if(grupoPlazo) grupoPlazo.style.display = 'none';
         if(nota) nota.style.display = 'none';
     } else {
-        // Opción Enganche (15)
         if(grupoEng) grupoEng.style.display = 'block';
         if(grupoPlazo) grupoPlazo.style.display = 'block';
         if(nota) nota.style.display = 'block';
@@ -131,8 +129,8 @@ function generarCotizacion3x2() {
     const subtitulo = "Promoción 3 x 2";
 
     if (mpVal === 'contado') {
-        totalPagar = precioBase * 0.95; 
-        descTexto = `Paga 2, Lleva 3 (Contado -5%)`;
+        totalPagar = precioBase * 0.80; // CORREGIDO A 20%
+        descTexto = `Paga 2, Lleva 3 (Contado -20%)`;
         
         lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
         htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
@@ -143,17 +141,15 @@ function generarCotizacion3x2() {
         let nombreMP = mpDesc === 3 ? "DD36" : "D036"; 
         descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
         
-        // Va directo a 36 meses, sin enganche
         lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
         htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
         htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
     } else {
-        // Enganche 15% Descuento Directo
         let mpDesc = 15;
         totalPagar = precioBase * (1 - (mpDesc / 100));
         descTexto = `Paga 2, Lleva 3 (Enganche -15%)`;
         
-        const meses = parseInt(document.getElementById('plazo-3x2').value);
+        const meses = parseInt(document.getElementById('plazo-3x2').value); // Ahora incluye el 36
         const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
         
         let engancheMonto = totalPagar * enganchePorcentaje;
@@ -246,7 +242,6 @@ function generarCotizacion() {
     const tp = document.getElementById('tipo-pago').value;
     let mp = parseFloat(document.getElementById('metodo-pago').value);
     
-    // Si la selección está en Enganche forzamos el 15%
     if(tp === 'enganche') { mp = 15; }
 
     const esInmediato = document.getElementById('toggle-inmediato').checked;
@@ -267,7 +262,6 @@ function generarCotizacion() {
     if (esInmediato) {
         dPromoServicio = 0; dPromoPropiedad = 0; dMP = 0;
     } else {
-        // REGLA ESTRICTA DE M036: Si es 0% anula CUALQUIER DESCUENTO sin importar nada
         if (mp === 0) {
             dPromoServicio = 0;
             dPromoPropiedad = 0;
@@ -307,7 +301,6 @@ function generarCotizacion() {
 
     totales.innerHTML = `<tr class="total-highlight"><td colspan="6" align="right">TOTAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(sumaFinal)}</td></tr>`;
     
-    // REGLA DE PAGOS Y ENGANCHE EN INICIO
     if (tp === 'contado') {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">PAGO ÚNICO DE CONTADO:</td><td class="text-right">${fmt(sumaFinal)}</td></tr>`;
     } else if (tp === 'enganche' && !esInmediato) {
