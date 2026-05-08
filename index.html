@@ -81,7 +81,7 @@
             <div class="grid-selection">
                 <div class="input-group">
                     <label>Servicios</label>
-                    <select id="servicio">
+                    <select id="servicio" onchange="validarServicioPropiedad()">
                         <option value="0" data-precio-inm="0" data-nombre="Ninguno" data-clave="-">Seleccione un servicio...</option>
                         <option value="43900" data-precio-inm="56300" data-nombre="Esencial" data-clave="S-101">Esencial</option>
                         <option value="56600" data-precio-inm="78605" data-nombre="Universal" data-clave="S-102">Universal</option>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="input-group">
                     <label>Propiedades</label>
-                    <select id="propiedad">
+                    <select id="propiedad" onchange="validarServicioPropiedad()">
                         <option value="0" data-precio-inm="0" data-categoria="ninguna" data-nombre="Ninguna" data-clave="-">Seleccione una propiedad...</option>
                         <option value="776355" data-precio-inm="1155295" data-categoria="capilla" data-nombre="Capilla Estandar" data-clave="825746">PAQ. CAPILLA ESTANDAR SP 6G 6O</option>
                         <option value="831160" data-precio-inm="1236845" data-categoria="capilla" data-nombre="Capilla clasica" data-clave="824975">PAQ. CAPILLA CLASICA SP 6G 6O</option>
@@ -128,7 +128,7 @@
                     <select id="tipo-pago" onchange="toggleOpcionesEnganche()">
                         <option value="normal">Tradicional (Aplica MP)</option>
                         <option value="contado">Contado (20% Desc. Único)</option>
-                        <option value="enganche">Enganche</option>
+                        <option value="enganche">Enganche (D035)</option>
                     </select>
                 </div>
                 <div class="input-group">
@@ -151,7 +151,7 @@
 
     </section>
 
-    <button class="btn-generate" onclick="generarCotizacion()">Calcular y Mostrar Cotización</button>
+    <button type="button" class="btn-generate" onclick="generarCotizacion()">Calcular y Mostrar Cotización</button>
 
     <section id="resultado-cotizacion" class="result-area" style="display: none;">
         <div id="pdf-capture" class="quote-page">
@@ -220,6 +220,6 @@
     <img class="modal-content" id="imgAmpliacion">
 </div>
 
-<script src="script.js?v=3"></script>
+<script src="script.js?v=4"></script>
 </body>
 </html>

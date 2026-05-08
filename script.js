@@ -76,6 +76,24 @@ function actualizarTelefono() {
 
 function fmt(n) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n); }
 
+// --- REGLA: CAPILLA/JARDIN NO PUEDE LLEVAR ESENCIAL ---
+function validarServicioPropiedad() {
+    const selServ = document.getElementById('servicio');
+    const selProp = document.getElementById('propiedad');
+    if (!selServ || !selProp) return;
+
+    const servVal = selServ.value; // '43900' es Esencial
+    const propIdx = selProp.selectedIndex;
+    if (propIdx >= 0) {
+        const catProp = selProp.options[propIdx].dataset.categoria;
+        
+        if (servVal === '43900' && (catProp === 'capilla' || catProp === 'jardin')) {
+            alert("No es posible combinar el Servicio Esencial con propiedades de tipo Capilla o Jardín. Por favor, selecciona un servicio Superior (Universal o Premier).");
+            selServ.value = "0"; // Reseteamos el servicio a 'Ninguno'
+        }
+    }
+}
+
 // --- LOGICA INTERFAZ INICIO ---
 function toggleOpcionesEnganche() {
     const tp = document.getElementById('tipo-pago');
@@ -129,7 +147,7 @@ function generarCotizacion3x2() {
     const subtitulo = "Promoción 3 x 2";
 
     if (mpVal === 'contado') {
-        totalPagar = precioBase * 0.80; // CORREGIDO A 20%
+        totalPagar = precioBase * 0.80; 
         descTexto = `Paga 2, Lleva 3 (Contado -20%)`;
         
         lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
@@ -149,7 +167,7 @@ function generarCotizacion3x2() {
         totalPagar = precioBase * (1 - (mpDesc / 100));
         descTexto = `Paga 2, Lleva 3 (Enganche -15%)`;
         
-        const meses = parseInt(document.getElementById('plazo-3x2').value); // Ahora incluye el 36
+        const meses = parseInt(document.getElementById('plazo-3x2').value); 
         const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
         
         let engancheMonto = totalPagar * enganchePorcentaje;
@@ -341,9 +359,27 @@ function cerrarModal() {
 }
 window.onclick = function(e) { if(e.target == document.getElementById("imgModal")) cerrarModal(); }
 
+// --- FUNCION CLONACIÓN INVISIBLE PARA PREVENIR CORTES DE IMÁGEN Y PDF EN MÓVIL ---
+function configurarCaptura(clonedDoc) {
+    const clonedTarget = clonedDoc.getElementById('pdf-capture');
+    if(clonedTarget) {
+        // Obliga a html2canvas a tomar la foto a un ancho de computadora
+        clonedTarget.style.width = '800px'; 
+        clonedTarget.style.maxWidth = 'none';
+        const tables = clonedTarget.querySelectorAll('.table-responsive');
+        tables.forEach(t => {
+            t.style.overflowX = 'visible'; // Muestra toda la tabla sin cortarla
+        });
+    }
+}
+
 function descargarPDF() {
+    const target = document.getElementById('pdf-capture');
     const { jsPDF } = window.jspdf;
-    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
+    html2canvas(target, { 
+        scale: 2,
+        onclone: configurarCaptura 
+    }).then(canvas => {
         const img = canvas.toDataURL('image/jpeg', 1.0);
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -352,8 +388,13 @@ function descargarPDF() {
         pdf.save('Cotizacion_Gayosso.pdf');
     });
 }
+
 function descargarImagen() {
-    html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
+    const target = document.getElementById('pdf-capture');
+    html2canvas(target, { 
+        scale: 2,
+        onclone: configurarCaptura
+    }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'Cotizacion_Gayosso.jpg';
         link.href = canvas.toDataURL('image/jpeg', 1.0);
