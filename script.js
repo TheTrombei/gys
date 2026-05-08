@@ -79,9 +79,17 @@ function fmt(n) { return new Intl.NumberFormat('es-MX', { style: 'currency', cur
 // --- LOGICA INTERFAZ INICIO ---
 function toggleOpcionesEnganche() {
     const tp = document.getElementById('tipo-pago');
-    if(tp) {
-        const panel = document.getElementById('grupo-enganche-principal');
-        if(panel) panel.style.display = (tp.value === 'enganche') ? 'block' : 'none';
+    const mp = document.getElementById('metodo-pago');
+    const panel = document.getElementById('grupo-enganche-principal');
+    
+    if(tp && mp) {
+        if(tp.value === 'enganche') {
+            mp.disabled = true; // Bloquea la selección manual porque Enganche impone el 15% automáticamente
+            if(panel) panel.style.display = 'block';
+        } else {
+            mp.disabled = false; // Desbloquea si cambian a otra opción
+            if(panel) panel.style.display = 'none';
+        }
     }
 }
 
@@ -107,11 +115,13 @@ function toggleEnganche3x2() {
     const grupoPlazo = document.getElementById('grupo-plazo-3x2');
     const nota = document.getElementById('nota-3x2');
     
-    if (mpVal.value === 'contado') {
+    // Si seleccionan las opciones a 36 meses directo o contado, se esconden los selectores
+    if (mpVal.value === 'contado' || mpVal.value === '3' || mpVal.value === '8') {
         grupoEng.style.display = 'none';
         if(grupoPlazo) grupoPlazo.style.display = 'none';
         nota.style.display = 'none';
     } else {
+        // Opción Enganche (15)
         grupoEng.style.display = 'block';
         if(grupoPlazo) grupoPlazo.style.display = 'block';
         nota.style.display = 'block';
@@ -158,14 +168,25 @@ function generarCotizacionEspecial() {
             lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
             htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
             htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
-        } else {
+        } else if (mpVal === '3' || mpVal === '8') {
             let mpDesc = parseFloat(mpVal);
             totalPagar = precioBase * (1 - (mpDesc / 100));
-            let nombreMP = mpDesc === 3 ? "DD36" : (mpDesc === 8 ? "D036" : "D035");
+            let nombreMP = mpDesc === 3 ? "DD36" : "D036"; 
             descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
+            
+            // Va directo a 36 meses, sin enganche
+            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
+        } else {
+            // Opción 15 (Enganche)
+            let mpDesc = 15;
+            totalPagar = precioBase * (1 - (mpDesc / 100));
+            descTexto = `Paga 2, Lleva 3 (Enganche -15%)`;
             
             const meses = parseInt(document.getElementById('plazo-3x2').value);
             const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
+            
             let engancheMonto = totalPagar * enganchePorcentaje;
             let saldoRestante = totalPagar - engancheMonto;
             let mensualidadFinanciada = saldoRestante / (meses - 1);
@@ -217,7 +238,11 @@ function generarCotizacion() {
     if(!document.getElementById('tipo-pago')) return; 
 
     const tp = document.getElementById('tipo-pago').value;
-    const mp = parseFloat(document.getElementById('metodo-pago').value);
+    let mp = parseFloat(document.getElementById('metodo-pago').value);
+    
+    // Por seguridad, si está en Enganche, forzamos el 15%
+    if(tp === 'enganche') { mp = 15; }
+
     const esInmediato = document.getElementById('toggle-inmediato').checked;
     const lista = document.getElementById('lista-items');
     const totales = document.getElementById('totales-tabla');
@@ -236,7 +261,7 @@ function generarCotizacion() {
     if (esInmediato) {
         dPromoServicio = 0; dPromoPropiedad = 0; dMP = 0;
     } else {
-        // REGLA ESTRICTA: Si es M036 (0%), BLOQUEA todos los descuentos da igual lo que compren
+        // REGLA ESTRICTA DE M036: Si es 0% anula CUALQUIER DESCUENTO sin importar nada
         if (mp === 0) {
             dPromoServicio = 0;
             dPromoPropiedad = 0;
@@ -276,17 +301,18 @@ function generarCotizacion() {
 
     totales.innerHTML = `<tr class="total-highlight"><td colspan="6" align="right">TOTAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(sumaFinal)}</td></tr>`;
     
+    // REGLA DE PAGOS Y ENGANCHE
     if (tp === 'contado') {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">PAGO ÚNICO DE CONTADO:</td><td class="text-right">${fmt(sumaFinal)}</td></tr>`;
     } else if (tp === 'enganche' && !esInmediato) {
         const enganchePorc = parseInt(document.getElementById('enganche-principal').value) / 100;
         let engancheMonto = sumaFinal * enganchePorc;
         let saldoRestante = sumaFinal - engancheMonto;
-        let mensualidad = saldoRestante / 36; 
+        let mensualidad = saldoRestante / 35; // Se divide entre 35 meses
 
-        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche Inicial (${enganchePorc*100}%):</td><td class="text-right">${fmt(engancheMonto)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche / 1ra Mensualidad (${enganchePorc*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
         totales.innerHTML += `<tr><td colspan="6" align="right">Saldo a Financiar:</td><td class="text-right">${fmt(saldoRestante)}</td></tr>`;
-        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="6" align="right">35 Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
     } else if (tp === 'normal' && sumaFinal > 0) {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(sumaFinal/36)}</td></tr>`;
     }
@@ -319,8 +345,11 @@ window.onclick = function(e) { if(e.target == document.getElementById("imgModal"
 function descargarPDF() {
     const { jsPDF } = window.jspdf;
     html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
+        const img = canvas.toDataURL('image/jpeg', 1.0);
         const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 0, 0, 210, (canvas.height * 210) / canvas.width);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(img, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         pdf.save('Cotizacion_Gayosso.pdf');
     });
 }
@@ -328,7 +357,7 @@ function descargarImagen() {
     html2canvas(document.getElementById('pdf-capture'), { scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'Cotizacion_Gayosso.jpg';
-        link.href = canvas.toDataURL('image/jpeg');
+        link.href = canvas.toDataURL('image/jpeg', 1.0);
         link.click();
     });
 }

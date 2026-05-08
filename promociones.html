@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promociones Especiales - Gayosso</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Menú de Promociones Especiales - Gayosso</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,181 +24,20 @@
 </header>
 
 <main class="container">
-    <section class="form-section">
-        
-        <div class="card">
-            <h2><span class="step">1</span> Datos del Cliente</h2>
-            <div class="grid-selection">
-                <div class="input-group">
-                    <label>Nombre a quien se cotiza</label>
-                    <input type="text" id="nombre-cliente" placeholder="Nombre completo del cliente">
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2><span class="step">2</span> Información del Asesor</h2>
-            <div class="grid-selection">
-                <div class="input-group">
-                    <label>Gerencia</label>
-                    <select id="gerencia" onchange="actualizarAsesores()">
-                        <option value="">Seleccione...</option>
-                        <option value="340">340</option>
-                        <option value="342">342</option>
-                        <option value="889">889</option>
-                        <option value="703">703</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Asesor</label>
-                    <select id="asesor" onchange="actualizarTelefono()">
-                        <option value="">Seleccione...</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Teléfono de Contacto</label>
-                    <input type="text" id="telefono" readonly placeholder="Autocompletado">
-                </div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <h2><span class="step">3</span> Configuración de la Promoción</h2>
-            <div class="grid-selection">
-                <div class="input-group">
-                    <label>Servicio Funerario (Precio Lista Normal)</label>
-                    <select id="servicio-especial">
-                        <option value="56600">Universal - $56,600</option>
-                        <option value="74800">Premier - $74,800</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Tipo de Promoción</label>
-                    <select id="tipo-promo" onchange="toggleOpcionesPromo()">
-                        <option value="3x2">3 x 2 (Paga 2, Lleva 3)</option>
-                        <option value="4x2">4 x 2 (Paga 2, Lleva 4)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="panel-3x2" style="display:block; margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee;">
-                <h3 style="color: var(--primary); margin-top: 0; font-size: 1rem;">Opciones de Pago 3x2</h3>
-                <div class="grid-selection">
-                    <div class="input-group">
-                        <label>Forma de Pago (3x2)</label>
-                        <select id="mp-3x2" onchange="toggleEnganche3x2()">
-                            <option value="3">DD36 (3% Descuento)</option>
-                            <option value="8">D036 (8% Descuento)</option>
-                            <option value="15">D035 (15% Descuento)</option>
-                            <option value="contado">Contado (5% Descuento)</option>
-                        </select>
-                    </div>
-                    <div class="input-group" id="grupo-plazo-3x2">
-                        <label>Plazo Mensual</label>
-                        <select id="plazo-3x2">
-                            <option value="12">12 Meses</option>
-                            <option value="24">24 Meses</option>
-                        </select>
-                    </div>
-                    <div class="input-group" id="grupo-enganche-3x2">
-                        <label>Porcentaje de Enganche (1ra Mensualidad)</label>
-                        <select id="enganche-3x2">
-                            <option value="15">15%</option>
-                            <option value="30">30%</option>
-                        </select>
-                    </div>
-                </div>
-                <p style="font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 0;" id="nota-3x2">*Nota: El enganche se considera la primera mensualidad.</p>
-            </div>
-
-            <div id="panel-4x2" style="display:none; margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 8px; border: 1px solid #eee;">
-                <h3 style="color: var(--primary); margin-top: 0; font-size: 1rem;">Opciones de Pago 4x2</h3>
-                <div class="grid-selection">
-                    <div class="input-group">
-                        <label>Forma de Pago (Sin descuento por MP)</label>
-                        <select id="forma-pago-4x2" onchange="toggleEnganche4x2()">
-                            <option value="D012">D012 (12 Meses)</option>
-                            <option value="D024">D024 (24 Meses)</option>
-                            <option value="contado">Contado (5% Descuento)</option>
-                        </select>
-                    </div>
-                    <div class="input-group" id="grupo-enganche-4x2">
-                        <label>Porcentaje de Enganche (1ra Mensualidad)</label>
-                        <select id="enganche-4x2">
-                            <option value="15">15%</option>
-                            <option value="30">30%</option>
-                        </select>
-                    </div>
-                </div>
-                <p style="font-size: 0.85rem; color: #666; font-style: italic; margin-bottom: 0;" id="nota-4x2">*Nota: El enganche se considera la primera mensualidad.</p>
-            </div>
-        </div>
-
-    </section>
-
-    <button class="btn-generate" onclick="generarCotizacionEspecial()">Generar Cotización Especial</button>
-
-    <section id="resultado-cotizacion" class="result-area" style="display: none;">
-        <div id="pdf-capture" class="quote-page">
-            <div class="quote-header">
-                <img id="logo-quote" src="logoalta.png" style="height: 60px;">
-                <div class="quote-title">
-                    <h3 id="titulo-cotizacion">PROMOCIÓN ESPECIAL GAYOSSO</h3>
-                    <p id="fecha-label"></p>
-                </div>
-            </div>
-
-            <div class="quote-info">
-                <p><strong>Cliente:</strong> <span id="res-cliente" style="text-transform: uppercase;"></span></p>
-                <p><strong>Asesor:</strong> <span id="res-asesor"></span> | <strong>Tel:</strong> <span id="res-telefono"></span></p>
-            </div>
-
-            <div class="table-responsive">
-                <table class="quote-table">
-                    <thead>
-                        <tr>
-                            <th>Descripción</th>
-                            <th class="text-right">Precio Lista Normal</th>
-                            <th class="text-right">Desc. Promo Especial</th>
-                            <th class="text-right">Total Final (x2 serv.)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista-items"></tbody>
-                    <tfoot id="totales-tabla"></tfoot>
-                </table>
-            </div>
-        </div>
-
-        <div class="download-actions">
-            <button class="btn-pdf" onclick="descargarPDF()">Descargar PDF</button>
-            <button class="btn-img" onclick="descargarImagen()">Descargar como Imagen</button>
-        </div>
-    </section>
-
-    <section class="card full-width" style="margin-top: 40px;">
-        <h2>Catálogo de Ataúdes y Urnas</h2>
-        <div class="catalog-grid">
-            <div class="catalog-item">
-                <label>Ataúdes Inhumación</label>
-                <div class="box-preview"><img src="inhumacion.png" alt="Ataúdes Inhumación" onclick="abrirModal(this.src)"></div>
-            </div>
-            <div class="catalog-item">
-                <label>Ataúdes Cremación</label>
-                <div class="box-preview"><img src="cremacion.png" alt="Ataúdes Cremación" onclick="abrirModal(this.src)"></div>
-            </div>
-            <div class="catalog-item">
-                <label>Urnas</label>
-                <div class="box-preview"><img src="urnas.png" alt="Urnas" onclick="abrirModal(this.src)"></div>
-            </div>
-        </div>
-    </section>
+    <h2 style="text-align: center; font-size: 2.2rem; color: var(--primary); border: none; display: block; margin-bottom: 5px;">Selecciona la Promoción Especial</h2>
+    <p style="text-align: center; color: #666; font-size: 1.1rem; margin-bottom: 40px;">Elige el esquema para generar la cotización</p>
+    
+    <div class="promo-menu">
+        <a href="promo_3x2.html" class="promo-box-link">
+            <h2>3x2</h2>
+            <p>Paga 2, Lleva 3</p>
+        </a>
+        <a href="promo_4x2.html" class="promo-box-link">
+            <h2>4x2</h2>
+            <p>Paga 2, Lleva 4</p>
+        </a>
+    </div>
 </main>
 
-<div id="imgModal" class="modal">
-    <span class="close" onclick="cerrarModal()">&times;</span>
-    <img class="modal-content" id="imgAmpliacion">
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>

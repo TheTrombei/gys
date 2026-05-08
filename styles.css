@@ -89,28 +89,74 @@ input:checked + .slider:before { transform: translateX(20px); }
 .box-preview img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: pointer; transition: 0.3s; }
 .box-preview img:hover { opacity: 0.7; transform: scale(1.05); }
 
-.quote-page { background: white; padding: 40px; border: 1px solid #eee; border-radius: 10px; }
+.quote-page { background: white; padding: 40px; border: 1px solid #eee; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 .quote-header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--primary); padding-bottom: 20px; }
 .quote-title h3 { margin: 0; color: var(--primary); }
 .quote-info { margin-top: 20px; padding: 15px; background: #fafafa; border-radius: 6px; }
+.quote-info p { margin: 5px 0; }
 
 .table-responsive { width: 100%; overflow-x: auto; margin-top: 20px; }
 .quote-table { width: 100%; border-collapse: collapse; min-width: 600px; } 
 .quote-table th { background: var(--primary); color: white; padding: 12px; text-align: left; }
 .quote-table td { padding: 12px; border-bottom: 1px solid #eee; }
 .text-right { text-align: right; }
+.total-highlight { background: #f9f9f9; font-weight: bold; font-size: 1.1em; }
 
 .download-actions { display: flex; gap: 20px; margin-top: 20px; margin-bottom: 30px;}
 .btn-pdf { background: #c0392b; color: white; flex: 1; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
 .btn-img { background: #2980b9; color: white; flex: 1; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;}
 
 .modal { display: none; position: fixed; z-index: 9999; padding-top: 60px; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
-.modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; animation: zoom 0.3s; }
-.close { position: absolute; top: 20px; right: 40px; color: #f1f1f1; font-size: 45px; font-weight: bold; cursor: pointer; }
+.modal-content { margin: auto; display: block; max-width: 90%; max-height: 80vh; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); animation: zoom 0.3s ease; }
+@keyframes zoom { from {transform:scale(0)} to {transform:scale(1)} }
+.close { position: absolute; top: 20px; right: 40px; color: #f1f1f1; font-size: 45px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.close:hover, .close:focus { color: #d4af37; text-decoration: none; }
+
+/* CAJAS DE SELECCIÓN DE PROMOS (NUEVO) */
+.promo-menu {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+.promo-box-link {
+    background: white;
+    border: 3px solid var(--primary);
+    border-radius: 15px;
+    padding: 50px 30px;
+    text-align: center;
+    width: 250px;
+    text-decoration: none;
+    color: var(--primary);
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.promo-box-link:hover {
+    transform: translateY(-10px);
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 15px 30px rgba(0,75,35,0.2);
+}
+.promo-box-link h2 {
+    font-size: 3rem;
+    margin: 0 0 10px 0;
+    color: inherit;
+    border: none;
+    justify-content: center;
+}
+.promo-box-link p {
+    font-size: 1.2rem;
+    margin: 0;
+    font-weight: bold;
+}
 
 @media (max-width: 768px) {
     .header-content { flex-direction: column; text-align: center; }
     .logo-container img { margin-right: 0; margin-bottom: 15px; }
-    .nav-buttons { justify-content: center; }
+    .nav-buttons { justify-content: center; flex-wrap: wrap; }
     .catalog-grid, .grid-selection, .download-actions { grid-template-columns: 1fr; flex-direction: column; }
+    .close { right: 20px; font-size: 35px; }
+    .quote-page { padding: 20px; }
+    .quote-table th, .quote-table td { padding: 8px; font-size: 13px; }
 }
