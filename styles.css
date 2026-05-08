@@ -112,44 +112,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 .close { position: absolute; top: 20px; right: 40px; color: #f1f1f1; font-size: 45px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 .close:hover, .close:focus { color: #d4af37; text-decoration: none; }
 
-/* CAJAS DE SELECCIÓN DE PROMOS (NUEVO) */
-.promo-menu {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 40px;
-    flex-wrap: wrap;
-}
-.promo-box-link {
-    background: white;
-    border: 3px solid var(--primary);
-    border-radius: 15px;
-    padding: 50px 30px;
-    text-align: center;
-    width: 250px;
-    text-decoration: none;
-    color: var(--primary);
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-}
-.promo-box-link:hover {
-    transform: translateY(-10px);
-    background: var(--primary);
-    color: white;
-    box-shadow: 0 15px 30px rgba(0,75,35,0.2);
-}
-.promo-box-link h2 {
-    font-size: 3rem;
-    margin: 0 0 10px 0;
-    color: inherit;
-    border: none;
-    justify-content: center;
-}
-.promo-box-link p {
-    font-size: 1.2rem;
-    margin: 0;
-    font-weight: bold;
-}
+.promo-menu { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+.promo-box-link { background: white; border: 3px solid var(--primary); border-radius: 15px; padding: 50px 30px; text-align: center; width: 250px; text-decoration: none; color: var(--primary); transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.promo-box-link:hover { transform: translateY(-10px); background: var(--primary); color: white; box-shadow: 0 15px 30px rgba(0,75,35,0.2); }
+.promo-box-link h2 { font-size: 3rem; margin: 0 0 10px 0; color: inherit; border: none; justify-content: center; }
+.promo-box-link p { font-size: 1.2rem; margin: 0; font-weight: bold; }
 
 @media (max-width: 768px) {
     .header-content { flex-direction: column; text-align: center; }

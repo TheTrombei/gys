@@ -84,7 +84,7 @@ function toggleOpcionesEnganche() {
     
     if(tp && mp) {
         if(tp.value === 'enganche') {
-            mp.disabled = true; // Bloquea la selección manual porque Enganche impone el 15% automáticamente
+            mp.disabled = true; // Bloquea la selección manual
             if(panel) panel.style.display = 'block';
         } else {
             mp.disabled = false; // Desbloquea si cambian a otra opción
@@ -93,21 +93,7 @@ function toggleOpcionesEnganche() {
     }
 }
 
-// --- LOGICA PAGINA PROMOCIONES ---
-function toggleOpcionesPromo() {
-    const promo = document.getElementById('tipo-promo').value;
-    
-    if (promo === '3x2') {
-        document.getElementById('panel-3x2').style.display = 'block';
-        document.getElementById('panel-4x2').style.display = 'none';
-        toggleEnganche3x2();
-    } else {
-        document.getElementById('panel-3x2').style.display = 'none';
-        document.getElementById('panel-4x2').style.display = 'block';
-        toggleEnganche4x2();
-    }
-}
-
+// --- LOGICA PROMO 3X2 ---
 function toggleEnganche3x2() {
     const mpVal = document.getElementById('mp-3x2');
     if(!mpVal) return;
@@ -117,111 +103,131 @@ function toggleEnganche3x2() {
     
     // Si seleccionan las opciones a 36 meses directo o contado, se esconden los selectores
     if (mpVal.value === 'contado' || mpVal.value === '3' || mpVal.value === '8') {
-        grupoEng.style.display = 'none';
+        if(grupoEng) grupoEng.style.display = 'none';
         if(grupoPlazo) grupoPlazo.style.display = 'none';
-        nota.style.display = 'none';
+        if(nota) nota.style.display = 'none';
     } else {
         // Opción Enganche (15)
-        grupoEng.style.display = 'block';
+        if(grupoEng) grupoEng.style.display = 'block';
         if(grupoPlazo) grupoPlazo.style.display = 'block';
-        nota.style.display = 'block';
+        if(nota) nota.style.display = 'block';
     }
 }
 
-function toggleEnganche4x2() {
-    const formaPago = document.getElementById('forma-pago-4x2').value;
-    const grupoEnganche = document.getElementById('grupo-enganche-4x2');
-    const nota = document.getElementById('nota-4x2');
-    
-    if (formaPago === 'contado') {
-        grupoEnganche.style.display = 'none';
-        nota.style.display = 'none';
-    } else {
-        grupoEnganche.style.display = 'block';
-        nota.style.display = 'block';
-    }
-}
-
-function generarCotizacionEspecial() {
+function generarCotizacion3x2() {
     const cliente = document.getElementById('nombre-cliente').value || "No especificado";
     const servicioPrecio = parseFloat(document.getElementById('servicio-especial').value);
-    const promo = document.getElementById('tipo-promo').value;
     const lista = document.getElementById('lista-items');
     const totales = document.getElementById('totales-tabla');
     
     lista.innerHTML = '';
     totales.innerHTML = '';
     let totalPagar = 0;
-    let subtitulo = "";
     let precioBase = servicioPrecio * 2;
     let descTexto = "";
     let htmlTotales = "";
 
-    if (promo === '3x2') {
-        const mpVal = document.getElementById('mp-3x2').value;
-        subtitulo = "Promoción 3 x 2";
+    const mpVal = document.getElementById('mp-3x2').value;
+    const subtitulo = "Promoción 3 x 2";
 
-        if (mpVal === 'contado') {
-            totalPagar = precioBase * 0.95; // 5% para contado promo
-            descTexto = `Paga 2, Lleva 3 (Contado -5%)`;
-            
-            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
-            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
-        } else if (mpVal === '3' || mpVal === '8') {
-            let mpDesc = parseFloat(mpVal);
-            totalPagar = precioBase * (1 - (mpDesc / 100));
-            let nombreMP = mpDesc === 3 ? "DD36" : "D036"; 
-            descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
-            
-            // Va directo a 36 meses, sin enganche
-            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
-            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
-        } else {
-            // Opción 15 (Enganche)
-            let mpDesc = 15;
-            totalPagar = precioBase * (1 - (mpDesc / 100));
-            descTexto = `Paga 2, Lleva 3 (Enganche -15%)`;
-            
-            const meses = parseInt(document.getElementById('plazo-3x2').value);
-            const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
-            
-            let engancheMonto = totalPagar * enganchePorcentaje;
-            let saldoRestante = totalPagar - engancheMonto;
-            let mensualidadFinanciada = saldoRestante / (meses - 1);
-            
-            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
-            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
-        }
+    if (mpVal === 'contado') {
+        totalPagar = precioBase * 0.95; 
+        descTexto = `Paga 2, Lleva 3 (Contado -5%)`;
+        
+        lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+        htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
+    } else if (mpVal === '3' || mpVal === '8') {
+        let mpDesc = parseFloat(mpVal);
+        totalPagar = precioBase * (1 - (mpDesc / 100));
+        let nombreMP = mpDesc === 3 ? "DD36" : "D036"; 
+        descTexto = `Paga 2, Lleva 3 (${nombreMP} -${mpDesc}%)`;
+        
+        // Va directo a 36 meses, sin enganche
+        lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+        htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(totalPagar / 36)}</td></tr>`;
     } else {
-        const formaPago = document.getElementById('forma-pago-4x2').value;
-        subtitulo = "Promoción 4 x 2";
+        // Enganche 15% Descuento Directo
+        let mpDesc = 15;
+        totalPagar = precioBase * (1 - (mpDesc / 100));
+        descTexto = `Paga 2, Lleva 3 (Enganche -15%)`;
+        
+        const meses = parseInt(document.getElementById('plazo-3x2').value);
+        const enganchePorcentaje = parseInt(document.getElementById('enganche-3x2').value) / 100;
+        
+        let engancheMonto = totalPagar * enganchePorcentaje;
+        let saldoRestante = totalPagar - engancheMonto;
+        let mensualidadFinanciada = saldoRestante / (meses - 1);
+        
+        lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+        htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+        htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
+    }
 
-        if (formaPago === 'contado') {
-            totalPagar = precioBase * 0.95; 
-            descTexto = "Paga 2, Lleva 4 (Contado -5%)";
-            
-            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
-            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
-        } else {
-            totalPagar = precioBase; 
-            descTexto = `Paga 2, Lleva 4 (${formaPago})`;
-            const meses = (formaPago === 'D012') ? 12 : 24;
-            const enganchePorcentaje = parseInt(document.getElementById('enganche-4x2').value) / 100;
-            
-            let engancheMonto = totalPagar * enganchePorcentaje;
-            let saldoRestante = totalPagar - engancheMonto;
-            let mensualidadFinanciada = saldoRestante / (meses - 1);
+    totales.innerHTML = htmlTotales;
+    document.getElementById('res-cliente').innerText = cliente;
+    document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
+    document.getElementById('res-telefono').innerText = document.getElementById('telefono').value;
+    document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
+    document.getElementById('resultado-cotizacion').style.display = 'block';
+    document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
+}
 
-            lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
-            htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
-            htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
-            htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
-        }
+// --- LOGICA PROMO 4X2 ---
+function toggleEnganche4x2() {
+    const formaPago = document.getElementById('forma-pago-4x2');
+    if(!formaPago) return;
+    const grupoEnganche = document.getElementById('grupo-enganche-4x2');
+    const nota = document.getElementById('nota-4x2');
+    
+    if (formaPago.value === 'contado') {
+        if(grupoEnganche) grupoEnganche.style.display = 'none';
+        if(nota) nota.style.display = 'none';
+    } else {
+        if(grupoEnganche) grupoEnganche.style.display = 'block';
+        if(nota) nota.style.display = 'block';
+    }
+}
+
+function generarCotizacion4x2() {
+    const cliente = document.getElementById('nombre-cliente').value || "No especificado";
+    const servicioPrecio = parseFloat(document.getElementById('servicio-especial').value);
+    const lista = document.getElementById('lista-items');
+    const totales = document.getElementById('totales-tabla');
+    
+    lista.innerHTML = '';
+    totales.innerHTML = '';
+    let totalPagar = 0;
+    let subtitulo = "Promoción 4 x 2";
+    let precioBase = servicioPrecio * 2;
+    let descTexto = "";
+    let htmlTotales = "";
+
+    const formaPago = document.getElementById('forma-pago-4x2').value;
+
+    if (formaPago === 'contado') {
+        totalPagar = precioBase * 0.95; 
+        descTexto = "Paga 2, Lleva 4 (Contado -5%)";
+        
+        lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+        htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold;"><td colspan="3" align="right">Pago Único de Contado:</td><td class="text-right">${fmt(totalPagar)}</td></tr>`;
+    } else {
+        totalPagar = precioBase; 
+        descTexto = `Paga 2, Lleva 4 (${formaPago})`;
+        const meses = (formaPago === 'D012') ? 12 : 24;
+        const enganchePorcentaje = parseInt(document.getElementById('enganche-4x2').value) / 100;
+        
+        let engancheMonto = totalPagar * enganchePorcentaje;
+        let saldoRestante = totalPagar - engancheMonto;
+        let mensualidadFinanciada = saldoRestante / (meses - 1);
+
+        lista.innerHTML = `<tr><td>Paquete ${subtitulo} (Universal/Premier)</td><td class="text-right">${fmt(precioBase)}</td><td class="text-right">${descTexto}</td><td class="text-right"><strong>${fmt(totalPagar)}</strong></td></tr>`;
+        htmlTotales += `<tr class="total-highlight"><td colspan="3" align="right">TOTAL FINAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(totalPagar)}</td></tr>`;
+        htmlTotales += `<tr style="color:#c0392b;"><td colspan="3" align="right">Enganche / 1ra Mensualidad (${enganchePorcentaje*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
+        htmlTotales += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="3" align="right">${meses-1} Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidadFinanciada)}</td></tr>`;
     }
 
     totales.innerHTML = htmlTotales;
@@ -240,7 +246,7 @@ function generarCotizacion() {
     const tp = document.getElementById('tipo-pago').value;
     let mp = parseFloat(document.getElementById('metodo-pago').value);
     
-    // Por seguridad, si está en Enganche, forzamos el 15%
+    // Si la selección está en Enganche forzamos el 15%
     if(tp === 'enganche') { mp = 15; }
 
     const esInmediato = document.getElementById('toggle-inmediato').checked;
@@ -301,18 +307,18 @@ function generarCotizacion() {
 
     totales.innerHTML = `<tr class="total-highlight"><td colspan="6" align="right">TOTAL A PAGAR:</td><td class="text-right" style="color:var(--primary); font-size:1.2em;">${fmt(sumaFinal)}</td></tr>`;
     
-    // REGLA DE PAGOS Y ENGANCHE
+    // REGLA DE PAGOS Y ENGANCHE EN INICIO
     if (tp === 'contado') {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">PAGO ÚNICO DE CONTADO:</td><td class="text-right">${fmt(sumaFinal)}</td></tr>`;
     } else if (tp === 'enganche' && !esInmediato) {
         const enganchePorc = parseInt(document.getElementById('enganche-principal').value) / 100;
         let engancheMonto = sumaFinal * enganchePorc;
         let saldoRestante = sumaFinal - engancheMonto;
-        let mensualidad = saldoRestante / 35; // Se divide entre 35 meses
+        let mensualidad = saldoRestante / 35; 
 
-        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche / 1ra Mensualidad (${enganchePorc*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
+        totales.innerHTML += `<tr style="color:#c0392b;"><td colspan="6" align="right">Enganche Inicial (${enganchePorc*100}%):</td><td class="text-right"><strong>${fmt(engancheMonto)}</strong></td></tr>`;
         totales.innerHTML += `<tr><td colspan="6" align="right">Saldo a Financiar:</td><td class="text-right">${fmt(saldoRestante)}</td></tr>`;
-        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="6" align="right">35 Mensualidades Restantes de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
+        totales.innerHTML += `<tr style="color:#004b23; font-weight:bold; background:#eef5f0;"><td colspan="6" align="right">35 Mensualidades de:</td><td class="text-right">${fmt(mensualidad)}</td></tr>`;
     } else if (tp === 'normal' && sumaFinal > 0) {
         totales.innerHTML += `<tr style="color:#004b23; font-weight:bold;"><td colspan="6" align="right">36 Mensualidades de:</td><td class="text-right">${fmt(sumaFinal/36)}</td></tr>`;
     }
