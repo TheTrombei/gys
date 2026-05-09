@@ -1,7 +1,7 @@
 // --- LÓGICA DE SEGURIDAD (OFUSCADA NIVEL 2) ---
 // Usamos códigos numéricos para esconder las contraseñas de los curiosos
-const U_SECRETO = [97, 114, 97, 99, 101, 108, 105, 46, 117, 108, 108, 111, 97]; // araceli.ulloa
-const P_SECRETO = [65, 114, 97, 99, 101, 108, 105, 46, 56, 56, 37]; // Araceli.88%
+const U_SECRETO = [97, 114, 97, 99, 101, 108, 105, 46, 117, 108, 108, 111, 97];
+const P_SECRETO = [65, 114, 97, 99, 101, 108, 105, 46, 56, 56, 37];
 
 function comprobar(texto, arraySecreto) {
     if(texto.length !== arraySecreto.length) return false;
