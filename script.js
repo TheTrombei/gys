@@ -1,12 +1,18 @@
-// --- LÓGICA DE SEGURIDAD (OFUSCADA) ---
-const U_SECRETO = "==QYvxbG15SasV2YhJXY"; 
-const P_SECRETO = "=UCO44SasV2YhJXQ"; 
+// --- LÓGICA DE SEGURIDAD (OFUSCADA NIVEL 2) ---
+// Usamos códigos numéricos para esconder las contraseñas de los curiosos
+const U_SECRETO = [97, 114, 97, 99, 101, 108, 105, 46, 117, 108, 108, 111, 97]; // araceli.ulloa
+const P_SECRETO = [65, 114, 97, 99, 101, 108, 105, 46, 56, 56, 37]; // Araceli.88%
 
-function ofuscar(texto) {
-    return btoa(texto).split('').reverse().join('');
+function comprobar(texto, arraySecreto) {
+    if(texto.length !== arraySecreto.length) return false;
+    for(let i=0; i<texto.length; i++) {
+        if(texto.charCodeAt(i) !== arraySecreto[i]) return false;
+    }
+    return true;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Si ya ingresó correctamente antes, no le vuelve a pedir (Tipo Wi-Fi)
     if(localStorage.getItem("accesoConcedido") === "true") {
         const overlay = document.getElementById("login-overlay");
         if(overlay) overlay.style.display = "none";
@@ -14,13 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function verificarAcceso() {
-    const u = document.getElementById("login-user").value;
-    const p = document.getElementById("login-pass").value;
+    // .trim() quita espacios accidentales. .toLowerCase() evita el error de la mayúscula inicial del celular en el usuario.
+    const u = document.getElementById("login-user").value.trim().toLowerCase(); 
+    const p = document.getElementById("login-pass").value.trim();
     
-    // Compara el texto escrito contra el encriptado
-    if(ofuscar(u) === U_SECRETO && ofuscar(p) === P_SECRETO) {
+    if(comprobar(u, U_SECRETO) && comprobar(p, P_SECRETO)) {
         localStorage.setItem("accesoConcedido", "true");
         document.getElementById("login-overlay").style.display = "none";
+        document.getElementById("login-error").style.display = "none";
     } else {
         document.getElementById("login-error").style.display = "block";
     }
