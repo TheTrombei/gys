@@ -1,7 +1,6 @@
-// --- LÓGICA DE SEGURIDAD (OFUSCADA NIVEL 2) ---
-// Usamos códigos numéricos para esconder las contraseñas de los curiosos
-const U_SECRETO = [97, 114, 97, 99, 101, 108, 105, 46, 117, 108, 108, 111, 97];
-const P_SECRETO = [65, 114, 97, 99, 101, 108, 105, 46, 56, 56, 37];
+// --- LÓGICA DE SEGURIDAD (OFUSCADA) ---
+const U_SECRETO = [97, 114, 97, 99, 101, 108, 105, 46, 117, 108, 108, 111, 97]; // araceli.ulloa
+const P_SECRETO = [65, 114, 97, 99, 101, 108, 105, 46, 56, 56, 37]; // Araceli.88%
 
 function comprobar(texto, arraySecreto) {
     if(texto.length !== arraySecreto.length) return false;
@@ -12,7 +11,6 @@ function comprobar(texto, arraySecreto) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Si ya ingresó correctamente antes, no le vuelve a pedir (Tipo Wi-Fi)
     if(localStorage.getItem("accesoConcedido") === "true") {
         const overlay = document.getElementById("login-overlay");
         if(overlay) overlay.style.display = "none";
@@ -20,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function verificarAcceso() {
-    // .trim() quita espacios accidentales. .toLowerCase() evita el error de la mayúscula inicial del celular en el usuario.
     const u = document.getElementById("login-user").value.trim().toLowerCase(); 
     const p = document.getElementById("login-pass").value.trim();
     
@@ -107,7 +104,6 @@ function actualizarAsesores() {
 
 function fmt(n) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n); }
 
-// --- REGLA: CAPILLA/JARDIN NO PUEDE LLEVAR ESENCIAL ---
 function validarServicioPropiedad() {
     const selServ = document.getElementById('servicio');
     const selProp = document.getElementById('propiedad');
@@ -134,6 +130,10 @@ function toggleOpcionesEnganche() {
         if(tp.value === 'enganche') {
             mp.disabled = true; 
             if(panel) panel.style.display = 'block';
+        } else if (tp.value === 'contado') {
+            mp.value = "0"; 
+            mp.disabled = true;
+            if(panel) panel.style.display = 'none';
         } else {
             mp.disabled = false; 
             if(panel) panel.style.display = 'none';
@@ -220,10 +220,8 @@ function generarCotizacion3x2() {
     }
     
     document.getElementById('res-asesor').innerText = nombreAsesor;
-    
     const telefonoEl = document.getElementById('telefono');
     document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
-    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
@@ -294,10 +292,8 @@ function generarCotizacion4x2() {
     }
     
     document.getElementById('res-asesor').innerText = nombreAsesor;
-    
     const telefonoEl = document.getElementById('telefono');
     document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
-    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
@@ -310,8 +306,6 @@ function generarCotizacion() {
     const tp = document.getElementById('tipo-pago').value;
     let mp = parseFloat(document.getElementById('metodo-pago').value);
     
-    if(tp === 'enganche') { mp = 15; }
-
     const esInmediato = document.getElementById('toggle-inmediato').checked;
     const lista = document.getElementById('lista-items');
     const totales = document.getElementById('totales-tabla');
@@ -327,30 +321,42 @@ function generarCotizacion() {
 
     let dPromoServicio = 0, dPromoPropiedad = 0, dMP = 0;
 
+    // Cálculo centralizado de promociones por volumen
+    let promoS = 0; let promoP = 0;
+    if (cantServicios > 0 && valPropiedad > 0) {
+        const cat = selProp.options[selProp.selectedIndex].dataset.categoria;
+        if (cat && tablaIntegrales[cat]) {
+            let idx = cantServicios >= 4 ? 3 : cantServicios - 1;
+            promoS = tablaIntegrales[cat][idx];
+            promoP = tablaIntegrales[cat][idx];
+        }
+    } else if (cantServicios > 0) {
+        promoS = (cantServicios === 1) ? 10 : 20;
+    }
+
+    // Aplicación de reglas
     if (esInmediato) {
         dPromoServicio = 0; dPromoPropiedad = 0; dMP = 0;
+    } else if (tp === 'contado') {
+        // En contado se aplica un 20% de MP y SÍ aplican las promociones normales
+        dMP = 20;
+        dPromoServicio = promoS;
+        dPromoPropiedad = promoP;
+    } else if (tp === 'enganche') {
+        // En enganche es 15% de MP y SÍ aplican las promociones normales
+        dMP = 15;
+        dPromoServicio = promoS;
+        dPromoPropiedad = promoP;
+    } else if (mp === 0) {
+        // REGLA ESTRICTA DE M036: Si es 0% anula CUALQUIER DESCUENTO
+        dPromoServicio = 0;
+        dPromoPropiedad = 0;
+        dMP = 0;
     } else {
-        if (mp === 0) {
-            dPromoServicio = 0;
-            dPromoPropiedad = 0;
-            dMP = 0;
-        } else {
-            dMP = (tp === 'enganche') ? 15 : mp;
-            if (tp === 'contado') {
-                dPromoServicio = 20; dPromoPropiedad = 20;
-            } else {
-                if (cantServicios > 0 && valPropiedad > 0) {
-                    const cat = selProp.options[selProp.selectedIndex].dataset.categoria;
-                    if (cat && tablaIntegrales[cat]) {
-                        let idx = cantServicios >= 4 ? 3 : cantServicios - 1;
-                        dPromoServicio = tablaIntegrales[cat][idx];
-                        dPromoPropiedad = tablaIntegrales[cat][idx];
-                    }
-                } else if (cantServicios > 0) {
-                    dPromoServicio = (cantServicios === 1) ? 10 : 20;
-                }
-            }
-        }
+        // Tradicional con descuentos
+        dMP = mp;
+        dPromoServicio = promoS;
+        dPromoPropiedad = promoP;
     }
 
     if (cantServicios > 0 && valServicio > 0) {
@@ -393,10 +399,8 @@ function generarCotizacion() {
     }
     
     document.getElementById('res-asesor').innerText = nombreAsesor;
-    
     const telefonoEl = document.getElementById('telefono');
     document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
-    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
