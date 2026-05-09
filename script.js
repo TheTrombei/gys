@@ -1,6 +1,10 @@
-// --- CREDENCIALES DE ACCESO ---
-const USUARIO_VALIDO = "araceli.ulloa";
-const PASS_VALIDO = "Araceli.88%";
+// --- LÓGICA DE SEGURIDAD (OFUSCADA) ---
+const U_SECRETO = "==QYvxbG15SasV2YhJXY"; 
+const P_SECRETO = "=UCO44SasV2YhJXQ"; 
+
+function ofuscar(texto) {
+    return btoa(texto).split('').reverse().join('');
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     if(localStorage.getItem("accesoConcedido") === "true") {
@@ -13,7 +17,8 @@ function verificarAcceso() {
     const u = document.getElementById("login-user").value;
     const p = document.getElementById("login-pass").value;
     
-    if(u === USUARIO_VALIDO && p === PASS_VALIDO) {
+    // Compara el texto escrito contra el encriptado
+    if(ofuscar(u) === U_SECRETO && ofuscar(p) === P_SECRETO) {
         localStorage.setItem("accesoConcedido", "true");
         document.getElementById("login-overlay").style.display = "none";
     } else {
