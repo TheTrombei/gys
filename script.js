@@ -62,7 +62,9 @@ const asesoresDB = {
         { n: "FLORES OCHOA AYME" },
         { n: "GALLAGA MAGDALENO ADELA" },
         { n: "MONTAÑO DELGADO CARLOS JAIME" },
-        { n: "MIRANDA DE LA PARRA CLAUDIA" }
+        { n: "MIRANDA DE LA PARRA CLAUDIA" },
+        { n: "REBOLLAR SUAREZ CAROLINA" },
+        { n: "GRACIANO HERNANDEZ MONICA LUCIA" }
     ],
     "703": [
         { n: "GONZALEZ ESCOTO ANTONIO" },
