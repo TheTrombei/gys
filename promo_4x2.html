@@ -10,6 +10,21 @@
 </head>
 <body>
 
+<div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+        <img src="logoalta.png" alt="Gayosso" style="height: 60px; margin-bottom: 20px;">
+        <h2>Acceso Restringido</h2>
+        <div class="input-group">
+            <input type="text" id="login-user" placeholder="Usuario">
+        </div>
+        <div class="input-group" style="margin-top: 15px;">
+            <input type="password" id="login-pass" placeholder="Contraseña">
+        </div>
+        <button class="btn-generate" style="margin-top: 20px; margin-bottom: 0;" onclick="verificarAcceso()">Ingresar</button>
+        <p id="login-error" style="color: #c0392b; display: none; margin-top: 15px; font-weight: bold;">Credenciales incorrectas</p>
+    </div>
+</div>
+
 <header class="main-header">
     <div class="header-content">
         <div class="logo-container">
@@ -54,13 +69,13 @@
                 </div>
                 <div class="input-group">
                     <label>Asesor</label>
-                    <select id="asesor" onchange="actualizarTelefono()">
+                    <select id="asesor">
                         <option value="">Seleccione...</option>
                     </select>
                 </div>
                 <div class="input-group">
                     <label>Teléfono de Contacto</label>
-                    <input type="text" id="telefono" readonly placeholder="Autocompletado">
+                    <input type="text" id="telefono" placeholder="Ingrese su número de celular">
                 </div>
             </div>
         </div>
@@ -165,6 +180,6 @@
     <img class="modal-content" id="imgAmpliacion">
 </div>
 
-<script src="script.js?v=4"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>

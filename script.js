@@ -1,45 +1,69 @@
+// --- CREDENCIALES DE ACCESO ---
+const USUARIO_VALIDO = "araceli.ulloa";
+const PASS_VALIDO = "Araceli.88%";
+
+document.addEventListener("DOMContentLoaded", () => {
+    if(localStorage.getItem("accesoConcedido") === "true") {
+        const overlay = document.getElementById("login-overlay");
+        if(overlay) overlay.style.display = "none";
+    }
+});
+
+function verificarAcceso() {
+    const u = document.getElementById("login-user").value;
+    const p = document.getElementById("login-pass").value;
+    
+    if(u === USUARIO_VALIDO && p === PASS_VALIDO) {
+        localStorage.setItem("accesoConcedido", "true");
+        document.getElementById("login-overlay").style.display = "none";
+    } else {
+        document.getElementById("login-error").style.display = "block";
+    }
+}
+
+// --- BASE DE DATOS ASESORES ---
 const asesoresDB = {
     "340": [
-        { n: "FERNANDEZ DUARTE CLAUDIA", t: "477" },
-        { n: "CHAVEZ MALDONADO HUMBERTINA", t: "477" },
-        { n: "GRANA LUNA BRENDA LIZBETH", t: "477" },
-        { n: "GUICOL BARRENO JOSE LUIS ELIAS", t: "477" },
-        { n: "DELGADO PEREZ YOLANDA LETICIA", t: "477" },
-        { n: "CASTILLO SAAVEDRA JOSE DE JESUS", t: "477" }
+        { n: "FERNANDEZ DUARTE CLAUDIA" },
+        { n: "CHAVEZ MALDONADO HUMBERTINA" },
+        { n: "GRANA LUNA BRENDA LIZBETH" },
+        { n: "GUICOL BARRENO JOSE LUIS ELIAS" },
+        { n: "DELGADO PEREZ YOLANDA LETICIA" },
+        { n: "CASTILLO SAAVEDRA JOSE DE JESUS" }
     ],
     "342": [
-        { n: "BARRON MENDOZA SONIA JAZMIN", t: "477" },
-        { n: "AGUIRRE PEREZ SALVADOR", t: "477" },
-        { n: "RUIZ CAMARILLO WENDY GERALDINE", t: "477" },
-        { n: "PALMA PALOMINO ARACELI", t: "477" },
-        { n: "GUERRA GRANADOS OSCAR DAVID", t: "477" },
-        { n: "FUENTES NUÑEZ BERENICE", t: "477" },
-        { n: "RAMIREZ HERNANDEZ LEONARDO", t: "477" }
+        { n: "BARRON MENDOZA SONIA JAZMIN" },
+        { n: "AGUIRRE PEREZ SALVADOR" },
+        { n: "RUIZ CAMARILLO WENDY GERALDINE" },
+        { n: "PALMA PALOMINO ARACELI" },
+        { n: "GUERRA GRANADOS OSCAR DAVID" },
+        { n: "FUENTES NUÑEZ BERENICE" },
+        { n: "RAMIREZ HERNANDEZ LEONARDO" }
     ],
     "889": [ 
-        { n: "LUNA ALVARADO MAURICIO", t: "477" },
-        { n: "SANCHEZ MORELES ABELINA", t: "477" },
-        { n: "RIOS SANDOVAL MAGNOLIA", t: "477" },
-        { n: "ACOSTA MOLINA ELENA MARIA GUADALUPE", t: "477" },
-        { n: "HERNANDEZ ALVARADO ANGELICA MARIA", t: "477" },
-        { n: "MURILLO JARAMILLO ANA BERTHA", t: "477" },
-        { n: "FLORES OCHOA AYME", t: "477" },
-        { n: "GALLAGA MAGDALENO ADELA", t: "477" },
-        { n: "MONTAÑO DELGADO CARLOS JAIME", t: "477" },
-        { n: "MIRANDA DE LA PARRA CLAUDIA", t: "477" }
+        { n: "LUNA ALVARADO MAURICIO" },
+        { n: "SANCHEZ MORELES ABELINA" },
+        { n: "RIOS SANDOVAL MAGNOLIA" },
+        { n: "ACOSTA MOLINA ELENA MARIA GUADALUPE" },
+        { n: "HERNANDEZ ALVARADO ANGELICA MARIA" },
+        { n: "MURILLO JARAMILLO ANA BERTHA" },
+        { n: "FLORES OCHOA AYME" },
+        { n: "GALLAGA MAGDALENO ADELA" },
+        { n: "MONTAÑO DELGADO CARLOS JAIME" },
+        { n: "MIRANDA DE LA PARRA CLAUDIA" }
     ],
     "703": [
-        { n: "GONZALEZ ESCOTO ANTONIO", t: "477" },
-        { n: "BENITEZ HERNANDEZ JESUS ROGELIO", t: "477" },
-        { n: "PEREZ SILVA LAURA", t: "477" },
-        { n: "URRUTIA MATA MARGARITO SEBASTIAN", t: "477" },
-        { n: "PATLAN ALVARADO SERGIO ALEJANDRO", t: "477" },
-        { n: "HERNANDEZ QUINTERO RICARDO", t: "477" },
-        { n: "CHACON URIBE GILBERTO", t: "477" },
-        { n: "MENDOZA RODRIGUEZ BELEM GUADALUPE", t: "477" },
-        { n: "SANDOVAL GUTIERREZ NATALI ELIZABETH", t: "477" },
-        { n: "MEDINA CRUZ LUIS RAMON", t: "477" },
-        { n: "TREJO ABARCA NURIA FABIOLA", t: "477" }
+        { n: "GONZALEZ ESCOTO ANTONIO" },
+        { n: "BENITEZ HERNANDEZ JESUS ROGELIO" },
+        { n: "PEREZ SILVA LAURA" },
+        { n: "URRUTIA MATA MARGARITO SEBASTIAN" },
+        { n: "PATLAN ALVARADO SERGIO ALEJANDRO" },
+        { n: "HERNANDEZ QUINTERO RICARDO" },
+        { n: "CHACON URIBE GILBERTO" },
+        { n: "MENDOZA RODRIGUEZ BELEM GUADALUPE" },
+        { n: "SANDOVAL GUTIERREZ NATALI ELIZABETH" },
+        { n: "MEDINA CRUZ LUIS RAMON" },
+        { n: "TREJO ABARCA NURIA FABIOLA" }
     ]
 };
 
@@ -61,17 +85,10 @@ function actualizarAsesores() {
     if (asesoresDB[g]) {
         asesoresDB[g].forEach(p => {
             let opt = document.createElement('option');
-            opt.value = p.n; opt.textContent = p.n; opt.dataset.tel = p.t;
+            opt.value = p.n; opt.textContent = p.n;
             a.appendChild(opt);
         });
     }
-}
-
-function actualizarTelefono() {
-    const a = document.getElementById('asesor');
-    if(!a) return;
-    const sel = a.options[a.selectedIndex];
-    document.getElementById('telefono').value = sel ? sel.dataset.tel || '' : '';
 }
 
 function fmt(n) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(n); }
@@ -82,14 +99,13 @@ function validarServicioPropiedad() {
     const selProp = document.getElementById('propiedad');
     if (!selServ || !selProp) return;
 
-    const servVal = selServ.value; // '43900' es Esencial
+    const servVal = selServ.value;
     const propIdx = selProp.selectedIndex;
     if (propIdx >= 0) {
         const catProp = selProp.options[propIdx].dataset.categoria;
-        
         if (servVal === '43900' && (catProp === 'capilla' || catProp === 'jardin')) {
-            alert("No es posible combinar el Servicio Esencial con propiedades de tipo Capilla o Jardín. Por favor, selecciona un servicio Superior (Universal o Premier).");
-            selServ.value = "0"; // Reseteamos el servicio a 'Ninguno'
+            alert("No es posible combinar el Servicio Esencial con propiedades de tipo Capilla o Jardín. Por favor, selecciona un servicio Superior.");
+            selServ.value = "0"; 
         }
     }
 }
@@ -182,8 +198,18 @@ function generarCotizacion3x2() {
 
     totales.innerHTML = htmlTotales;
     document.getElementById('res-cliente').innerText = cliente;
-    document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
-    document.getElementById('res-telefono').innerText = document.getElementById('telefono').value;
+    
+    const asesorEl = document.getElementById('asesor');
+    let nombreAsesor = "No especificado";
+    if(asesorEl && asesorEl.options[asesorEl.selectedIndex]) {
+        nombreAsesor = asesorEl.options[asesorEl.selectedIndex].text;
+    }
+    
+    document.getElementById('res-asesor').innerText = nombreAsesor;
+    
+    const telefonoEl = document.getElementById('telefono');
+    document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
+    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
@@ -246,8 +272,18 @@ function generarCotizacion4x2() {
 
     totales.innerHTML = htmlTotales;
     document.getElementById('res-cliente').innerText = cliente;
-    document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
-    document.getElementById('res-telefono').innerText = document.getElementById('telefono').value;
+    
+    const asesorEl = document.getElementById('asesor');
+    let nombreAsesor = "No especificado";
+    if(asesorEl && asesorEl.options[asesorEl.selectedIndex]) {
+        nombreAsesor = asesorEl.options[asesorEl.selectedIndex].text;
+    }
+    
+    document.getElementById('res-asesor').innerText = nombreAsesor;
+    
+    const telefonoEl = document.getElementById('telefono');
+    document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
+    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
@@ -335,14 +371,36 @@ function generarCotizacion() {
     }
 
     document.getElementById('res-cliente').innerText = document.getElementById('nombre-cliente').value;
-    document.getElementById('res-asesor').innerText = document.getElementById('asesor').value;
-    document.getElementById('res-telefono').innerText = document.getElementById('telefono').value;
+    
+    const asesorEl = document.getElementById('asesor');
+    let nombreAsesor = "No especificado";
+    if(asesorEl && asesorEl.options[asesorEl.selectedIndex]) {
+        nombreAsesor = asesorEl.options[asesorEl.selectedIndex].text;
+    }
+    
+    document.getElementById('res-asesor').innerText = nombreAsesor;
+    
+    const telefonoEl = document.getElementById('telefono');
+    document.getElementById('res-telefono').innerText = telefonoEl ? telefonoEl.value : "";
+    
     document.getElementById('fecha-label').innerText = new Date().toLocaleDateString('es-MX');
     document.getElementById('resultado-cotizacion').style.display = 'block';
     document.getElementById('resultado-cotizacion').scrollIntoView({ behavior: 'smooth' });
 }
 
 // --- COMUNES ---
+function configurarCaptura(clonedDoc) {
+    const clonedTarget = clonedDoc.getElementById('pdf-capture');
+    if(clonedTarget) {
+        clonedTarget.style.width = '800px'; 
+        clonedTarget.style.maxWidth = 'none';
+        const tables = clonedTarget.querySelectorAll('.table-responsive');
+        tables.forEach(t => {
+            t.style.overflowX = 'visible'; 
+        });
+    }
+}
+
 function abrirModal(src) { 
     const modal = document.getElementById("imgModal");
     const modalImg = document.getElementById("imgAmpliacion");
@@ -359,20 +417,6 @@ function cerrarModal() {
 }
 window.onclick = function(e) { if(e.target == document.getElementById("imgModal")) cerrarModal(); }
 
-// --- FUNCION CLONACIÓN INVISIBLE PARA PREVENIR CORTES DE IMÁGEN Y PDF EN MÓVIL ---
-function configurarCaptura(clonedDoc) {
-    const clonedTarget = clonedDoc.getElementById('pdf-capture');
-    if(clonedTarget) {
-        // Obliga a html2canvas a tomar la foto a un ancho de computadora
-        clonedTarget.style.width = '800px'; 
-        clonedTarget.style.maxWidth = 'none';
-        const tables = clonedTarget.querySelectorAll('.table-responsive');
-        tables.forEach(t => {
-            t.style.overflowX = 'visible'; // Muestra toda la tabla sin cortarla
-        });
-    }
-}
-
 function descargarPDF() {
     const target = document.getElementById('pdf-capture');
     const { jsPDF } = window.jspdf;
@@ -388,7 +432,6 @@ function descargarPDF() {
         pdf.save('Cotizacion_Gayosso.pdf');
     });
 }
-
 function descargarImagen() {
     const target = document.getElementById('pdf-capture');
     html2canvas(target, { 
